@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCS 客服系統 - User Story Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        header p {
+            opacity: 0.9;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #16213e;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.customer { background: #e74c3c; }
+        .legend-color.t1 { background: #3498db; }
+        .legend-color.t2 { background: #2ecc71; }
+        .legend-color.t2-senior { background: #e67e22; }
+        .legend-color.manager { background: #9b59b6; }
+        .legend-color.ops { background: #1abc9c; }
+        
+        .release-filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .release-btn {
+            padding: 10px 24px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .release-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .release-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .story-map {
+            display: flex;
+            gap: 12px;
+            min-width: max-content;
+            padding-bottom: 20px;
+        }
+        
+        .activity-column {
+            min-width: 220px;
+            max-width: 220px;
+        }
+        
+        .activity-header {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .activity-header.customer { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .activity-header.t1 { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .activity-header.manager { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .activity-header.t2 { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .activity-header.ops { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        
+        .activity-header .emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .skeleton-tasks {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .skeleton-task {
+            padding: 8px 12px;
+            background: #0f3460;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .skeleton-task:last-child {
+            margin-bottom: 0;
+        }
+        
+        .release-section {
+            margin-bottom: 12px;
+        }
+        
+        .release-label {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .release-label.mvp {
+            background: #e74c3c;
+        }
+        
+        .release-label.r2 {
+            background: #f39c12;
+        }
+        
+        .release-label.r3 {
+            background: #27ae60;
+        }
+        
+        .story-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .story-card {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .story-card:hover {
+            transform: translateX(4px);
+            background: #1a2744;
+        }
+        
+        .story-card.core {
+            border-left-color: #f1c40f;
+        }
+        
+        .story-card.core::before {
+            content: "⭐";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .story-card.done {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        
+        .story-card .role-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+        }
+        
+        .story-card .role-tag.customer { background: #e74c3c; }
+        .story-card .role-tag.t1 { background: #3498db; }
+        .story-card .role-tag.t2 { background: #2ecc71; }
+        .story-card .role-tag.manager { background: #9b59b6; }
+        .story-card .role-tag.ops { background: #1abc9c; }
+        
+        /* Release visibility */
+        .story-map.show-mvp .release-section.r2,
+        .story-map.show-mvp .release-section.r3 {
+            display: none;
+        }
+        
+        .story-map.show-r2 .release-section.r3 {
+            display: none;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-section {
+            margin-bottom: 16px;
+        }
+        
+        .modal-section h4 {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        
+        .modal-section p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .modal-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .modal-section li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        
+        .modal-section li::before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+        }
+        
+        .modal-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-tag {
+            padding: 4px 12px;
+            background: #0f3460;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 15px;
+            background: #16213e;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .release-filter {
+                flex-wrap: wrap;
+            }
+            
+            .activity-column {
+                min-width: 180px;
+                max-width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🗺️ NCS 客服系統 - User Story Map</h1>
+        <p>參考 Jeff Patton《User Story Mapping》方法論</p>
+    </header>
+    
+    <div class="container">
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color customer"></div>
+                <span>🔴 客戶</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color t1"></div>
+                <span>🔵 T1 客服</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color t2"></div>
+                <span>🟢 T2 一般</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color t2-senior"></div>
+                <span>🟠 T2 資深</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color manager"></div>
+                <span>🟣 主管</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color ops"></div>
+                <span>📊 營運</span>
+            </div>
+            <div class="legend-item">
+                <span>⭐ = 核心功能</span>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="mvp-count">24</div>
+                <div class="stat-label">MVP 功能</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="r2-count">26</div>
+                <div class="stat-label">R2 功能</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="r3-count">12</div>
+                <div class="stat-label">R3 功能</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-count">62</div>
+                <div class="stat-label">總功能數</div>
+            </div>
+        </div>
+        
+        <div class="release-filter">
+            <button class="release-btn active" data-show="all">顯示全部</button>
+            <button class="release-btn" data-show="mvp">只看 MVP</button>
+            <button class="release-btn" data-show="r2">MVP + R2</button>
+        </div>
+        
+        <div class="story-map" id="storyMap">
+            <!-- Activity 1: Customer -->
+            <div class="activity-column">
+                <div class="activity-header customer">
+                    <span class="emoji">🔴</span>
+                    客戶遇到問題
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">尋找客服</div>
+                    <div class="skeleton-task">聯繫客服</div>
+                    <div class="skeleton-task">說明問題</div>
+                    <div class="skeleton-task">等待處理</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="app-entry">
+                            <span class="role-tag customer">客戶</span>
+                            <div>App 客服入口</div>
+                        </div>
+                        <div class="story-card" data-story="phone-service">
+                            <span class="role-tag customer">客戶</span>
+                            <div>電話客服接聽</div>
+                        </div>
+                        <div class="story-card" data-story="issue-record">
+                            <span class="role-tag customer">客戶</span>
+                            <div>問題描述記錄</div>
+                        </div>
+                        <div class="story-card" data-story="case-confirm">
+                            <span class="role-tag customer">客戶</span>
+                            <div>案件建立確認通知</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="web-entry">
+                            <span class="role-tag customer">客戶</span>
+                            <div>網頁客服入口</div>
+                        </div>
+                        <div class="story-card" data-story="line-service">
+                            <span class="role-tag customer">客戶</span>
+                            <div>Line 客服</div>
+                        </div>
+                        <div class="story-card" data-story="progress-push">
+                            <span class="role-tag customer">客戶</span>
+                            <div>處理進度主動推播</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="chatbot">
+                            <span class="role-tag customer">客戶</span>
+                            <div>智慧客服 Chatbot</div>
+                        </div>
+                        <div class="story-card" data-story="callback">
+                            <span class="role-tag customer">客戶</span>
+                            <div>排隊回撥服務</div>
+                        </div>
+                        <div class="story-card" data-story="satisfaction">
+                            <span class="role-tag customer">客戶</span>
+                            <div>滿意度即時評價</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity 2: T1 -->
+            <div class="activity-column">
+                <div class="activity-header t1">
+                    <span class="emoji">🔵</span>
+                    T1 接聽建單
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">了解問題</div>
+                    <div class="skeleton-task">查詢資料</div>
+                    <div class="skeleton-task">建立商談</div>
+                    <div class="skeleton-task">轉派 T2</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="call-receive">
+                            <span class="role-tag t1">T1</span>
+                            <div>客戶來電接聽</div>
+                        </div>
+                        <div class="story-card" data-story="order-query">
+                            <span class="role-tag t1">T1</span>
+                            <div>訂單查詢</div>
+                        </div>
+                        <div class="story-card" data-story="member-query">
+                            <span class="role-tag t1">T1</span>
+                            <div>會員查詢</div>
+                        </div>
+                        <div class="story-card" data-story="case-form">
+                            <span class="role-tag t1">T1</span>
+                            <div>商談表單填寫</div>
+                        </div>
+                        <div class="story-card" data-story="case-category">
+                            <span class="role-tag t1">T1</span>
+                            <div>案件分類選擇</div>
+                        </div>
+                        <div class="story-card" data-story="group-transfer">
+                            <span class="role-tag t1">T1</span>
+                            <div>選擇組別轉派</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="emotion-tag">
+                            <span class="role-tag t1">T1</span>
+                            <div>客戶情緒標記</div>
+                        </div>
+                        <div class="story-card core" data-story="customer-360">
+                            <span class="role-tag t1">T1</span>
+                            <div>整合式客戶檢視</div>
+                        </div>
+                        <div class="story-card" data-story="logistics-query">
+                            <span class="role-tag t1">T1</span>
+                            <div>物流查詢整合</div>
+                        </div>
+                        <div class="story-card" data-story="required-fields">
+                            <span class="role-tag t1">T1</span>
+                            <div>必填欄位驗證</div>
+                        </div>
+                        <div class="story-card" data-story="difficulty-tag">
+                            <span class="role-tag t1">T1</span>
+                            <div>案件難度標記</div>
+                        </div>
+                        <div class="story-card" data-story="smart-suggest">
+                            <span class="role-tag t1">T1</span>
+                            <div>智慧分派建議</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="diagnosis-wizard">
+                            <span class="role-tag t1">T1</span>
+                            <div>問題診斷精靈</div>
+                        </div>
+                        <div class="story-card" data-story="customer-timeline">
+                            <span class="role-tag t1">T1</span>
+                            <div>客戶歷史時間軸</div>
+                        </div>
+                        <div class="story-card" data-story="dynamic-form">
+                            <span class="role-tag t1">T1</span>
+                            <div>動態表單</div>
+                        </div>
+                        <div class="story-card" data-story="knowledge-search">
+                            <span class="role-tag t1">T1</span>
+                            <div>知識庫快速搜尋</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity 3: Manager Dispatch -->
+            <div class="activity-column">
+                <div class="activity-header manager">
+                    <span class="emoji">🟣</span>
+                    主管分派案件
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">查看待派案件</div>
+                    <div class="skeleton-task">分派案件</div>
+                    <div class="skeleton-task">調整分派</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="pending-list">
+                            <span class="role-tag manager">主管</span>
+                            <div>待分派案件清單</div>
+                        </div>
+                        <div class="story-card" data-story="manual-dispatch">
+                            <span class="role-tag manager">主管</span>
+                            <div>手動選擇 T2 分派</div>
+                        </div>
+                        <div class="story-card" data-story="priority-sort">
+                            <span class="role-tag manager">主管</span>
+                            <div>案件優先級排序</div>
+                        </div>
+                        <div class="story-card" data-story="reassign">
+                            <span class="role-tag manager">主管</span>
+                            <div>重新指派案件</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="workload-view">
+                            <span class="role-tag manager">主管</span>
+                            <div>T2 負載即時檢視</div>
+                        </div>
+                        <div class="story-card core" data-story="auto-dispatch">
+                            <span class="role-tag manager">主管</span>
+                            <div>自動分派規則引擎</div>
+                        </div>
+                        <div class="story-card core" data-story="3d-dispatch">
+                            <span class="role-tag manager">主管</span>
+                            <div>三維分派邏輯</div>
+                        </div>
+                        <div class="story-card" data-story="load-balance">
+                            <span class="role-tag manager">主管</span>
+                            <div>負載平衡演算法</div>
+                        </div>
+                        <div class="story-card" data-story="attendance-sync">
+                            <span class="role-tag manager">主管</span>
+                            <div>出勤狀態整合</div>
+                        </div>
+                        <div class="story-card" data-story="batch-reassign">
+                            <span class="role-tag manager">主管</span>
+                            <div>批次重派</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="manpower-forecast">
+                            <span class="role-tag manager">主管</span>
+                            <div>人力預測建議</div>
+                        </div>
+                        <div class="story-card" data-story="ai-dispatch">
+                            <span class="role-tag manager">主管</span>
+                            <div>AI 智慧分派</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity 4: T2 Process -->
+            <div class="activity-column">
+                <div class="activity-header t2">
+                    <span class="emoji">🟢</span>
+                    T2 處理案件
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">接收案件</div>
+                    <div class="skeleton-task">處理案件</div>
+                    <div class="skeleton-task">送出審核</div>
+                    <div class="skeleton-task">結案追蹤</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="case-notify">
+                            <span class="role-tag t2">T2</span>
+                            <div>案件通知接收</div>
+                        </div>
+                        <div class="story-card" data-story="my-cases">
+                            <span class="role-tag t2">T2</span>
+                            <div>我的案件清單</div>
+                        </div>
+                        <div class="story-card" data-story="case-detail">
+                            <span class="role-tag t2">T2</span>
+                            <div>查看案件詳情</div>
+                        </div>
+                        <div class="story-card" data-story="contact-record">
+                            <span class="role-tag t2">T2</span>
+                            <div>聯繫客戶記錄</div>
+                        </div>
+                        <div class="story-card" data-story="status-update">
+                            <span class="role-tag t2">T2</span>
+                            <div>更新案件狀態</div>
+                        </div>
+                        <div class="story-card" data-story="result-fill">
+                            <span class="role-tag t2">T2</span>
+                            <div>填寫處理結果</div>
+                        </div>
+                        <div class="story-card" data-story="submit-review">
+                            <span class="role-tag t2">T2</span>
+                            <div>送出審核</div>
+                        </div>
+                        <div class="story-card" data-story="case-track">
+                            <span class="role-tag t2">T2</span>
+                            <div>案件狀態追蹤</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="priority-display">
+                            <span class="role-tag t2">T2</span>
+                            <div>案件優先級顯示</div>
+                        </div>
+                        <div class="story-card" data-story="quick-reply">
+                            <span class="role-tag t2">T2</span>
+                            <div>快速回覆範本</div>
+                        </div>
+                        <div class="story-card" data-story="cross-system">
+                            <span class="role-tag t2">T2</span>
+                            <div>跨系統查詢整合</div>
+                        </div>
+                        <div class="story-card" data-story="review-checklist">
+                            <span class="role-tag t2">T2</span>
+                            <div>審核 Checklist</div>
+                        </div>
+                        <div class="story-card" data-story="compensation">
+                            <span class="role-tag t2">T2</span>
+                            <div>補償申請流程</div>
+                        </div>
+                        <div class="story-card" data-story="auto-notify-customer">
+                            <span class="role-tag t2">T2</span>
+                            <div>自動通知客戶</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="case-knowledge">
+                            <span class="role-tag t2">T2</span>
+                            <div>案例知識庫搜尋</div>
+                        </div>
+                        <div class="story-card" data-story="tiered-auth">
+                            <span class="role-tag t2">T2</span>
+                            <div>分級授權快速簽核</div>
+                        </div>
+                        <div class="story-card" data-story="multi-channel">
+                            <span class="role-tag t2">T2</span>
+                            <div>多管道聯繫整合</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity 5: Manager Monitor -->
+            <div class="activity-column">
+                <div class="activity-header manager">
+                    <span class="emoji">🟣</span>
+                    主管監控審核
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">查看進度</div>
+                    <div class="skeleton-task">審核結案</div>
+                    <div class="skeleton-task">處理升級</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="review-list">
+                            <span class="role-tag manager">主管</span>
+                            <div>待審核清單</div>
+                        </div>
+                        <div class="story-card" data-story="approve-reject">
+                            <span class="role-tag manager">主管</span>
+                            <div>案件審核通過/退回</div>
+                        </div>
+                        <div class="story-card" data-story="status-overview">
+                            <span class="role-tag manager">主管</span>
+                            <div>案件狀態總覽</div>
+                        </div>
+                        <div class="story-card" data-story="escalation">
+                            <span class="role-tag manager">主管</span>
+                            <div>升級案件處理</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card core" data-story="realtime-dashboard">
+                            <span class="role-tag manager">主管</span>
+                            <div>即時儀表板</div>
+                        </div>
+                        <div class="story-card core" data-story="group-kpi">
+                            <span class="role-tag manager">主管</span>
+                            <div>組別 KPI 顯示</div>
+                        </div>
+                        <div class="story-card" data-story="timeout-alert">
+                            <span class="role-tag manager">主管</span>
+                            <div>超時案件警示</div>
+                        </div>
+                        <div class="story-card" data-story="batch-review">
+                            <span class="role-tag manager">主管</span>
+                            <div>批次審核</div>
+                        </div>
+                        <div class="story-card" data-story="escalation-notify">
+                            <span class="role-tag manager">主管</span>
+                            <div>升級案件自動通知</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="member-report">
+                            <span class="role-tag manager">主管</span>
+                            <div>組員績效後台報表</div>
+                        </div>
+                        <div class="story-card" data-story="sla-monitor">
+                            <span class="role-tag manager">主管</span>
+                            <div>SLA 達成率監控</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity 6: Operations -->
+            <div class="activity-column">
+                <div class="activity-header ops">
+                    <span class="emoji">📊</span>
+                    營運分析
+                </div>
+                <div class="skeleton-tasks">
+                    <div class="skeleton-task">查看報表</div>
+                    <div class="skeleton-task">異常監控</div>
+                    <div class="skeleton-task">團隊管理</div>
+                </div>
+                
+                <div class="release-section mvp">
+                    <div class="release-label mvp">MVP</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="daily-report">
+                            <span class="role-tag ops">營運</span>
+                            <div>每日績效報表</div>
+                        </div>
+                        <div class="story-card" data-story="case-stats">
+                            <span class="role-tag ops">營運</span>
+                            <div>商談量統計</div>
+                        </div>
+                        <div class="story-card" data-story="group-manage">
+                            <span class="role-tag ops">營運</span>
+                            <div>T2 組別管理</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r2">
+                    <div class="release-label r2">R2</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="report-export">
+                            <span class="role-tag ops">營運</span>
+                            <div>報表自動匯出</div>
+                        </div>
+                        <div class="story-card core" data-story="hotword-analysis">
+                            <span class="role-tag ops">營運</span>
+                            <div>熱詞分析</div>
+                        </div>
+                        <div class="story-card core" data-story="alert-rules">
+                            <span class="role-tag ops">營運</span>
+                            <div>異常監控規則</div>
+                        </div>
+                        <div class="story-card core" data-story="realtime-alert">
+                            <span class="role-tag ops">營運</span>
+                            <div>即時通報</div>
+                        </div>
+                        <div class="story-card" data-story="dispatch-rules">
+                            <span class="role-tag ops">營運</span>
+                            <div>分派規則管理</div>
+                        </div>
+                        <div class="story-card" data-story="weekly-report">
+                            <span class="role-tag ops">營運</span>
+                            <div>週/月報表</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="release-section r3">
+                    <div class="release-label r3">R3</div>
+                    <div class="story-cards">
+                        <div class="story-card" data-story="data-viz">
+                            <span class="role-tag ops">營運</span>
+                            <div>數據視覺化儀表板</div>
+                        </div>
+                        <div class="story-card" data-story="predictive">
+                            <span class="role-tag ops">營運</span>
+                            <div>預測性分析</div>
+                        </div>
+                        <div class="story-card" data-story="scheduling">
+                            <span class="role-tag ops">營運</span>
+                            <div>人力資源排班整合</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3 id="modalTitle">故事標題</h3>
+            <div class="modal-section">
+                <h4>User Story</h4>
+                <p id="modalStory"></p>
+            </div>
+            <div class="modal-section">
+                <h4>驗收標準</h4>
+                <ul id="modalAC"></ul>
+            </div>
+            <div class="modal-section">
+                <h4>標籤</h4>
+                <div class="modal-tags" id="modalTags"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Story details
+        const storyDetails = {
+            'auto-dispatch': {
+                title: '⭐ 自動分派規則引擎',
+                story: '作為主管，我希望系統能依據規則自動分派案件給 T2，以便我不用每天花 1-2 小時手動分派。',
+                ac: [
+                    '支援三維分派：特殊性 → 業務類型 → 難度',
+                    '自動排除請假/出差/超量的 T2',
+                    '依負載平衡分配',
+                    '分派結果通知 T2'
+                ],
+                tags: ['R2', '核心', '主管', '8 點']
+            },
+            'group-kpi': {
+                title: '⭐ 組別 KPI 顯示',
+                story: '作為 T2 客服，我希望系統只顯示組別 KPI，不顯示個人數據，以便我不會有同儕比較的壓力。',
+                ac: [
+                    '組別看板顯示各階段案件總數',
+                    '個人只能看到自己的數據',
+                    '主管可在後台查看組員明細',
+                    '數據每 5 分鐘更新'
+                ],
+                tags: ['R2', '核心', 'T2', '3 點']
+            },
+            'hotword-analysis': {
+                title: '⭐ 熱詞分析',
+                story: '作為營運管理人員，我希望能看到商談內容的高頻關鍵字，以便主動識別潛在問題。',
+                ac: [
+                    '自動分析近 1/4/8/24 小時商談內容',
+                    '提取出現頻率最高的前 20 個關鍵字',
+                    '顯示數量和趨勢變化',
+                    '點擊可查看相關商談'
+                ],
+                tags: ['R2', '核心', '營運', '5 點']
+            },
+            'realtime-alert': {
+                title: '⭐ 即時通報',
+                story: '作為主管，我希望當特定關鍵字商談量異常時收到通報，以便我能提早發現問題。',
+                ac: [
+                    '可設定關鍵字監控規則',
+                    '支援絕對數量/相對增幅觸發',
+                    '5 分鐘內發送通報',
+                    '點擊可查看相關商談清單'
+                ],
+                tags: ['R2', '核心', '營運', '5 點']
+            },
+            'customer-360': {
+                title: '⭐ 整合式客戶檢視',
+                story: '作為 T1 客服，我希望在一個畫面看到客戶的所有資訊，以便我不用切換多個系統。',
+                ac: [
+                    '整合訂單、會員、物流、歷史案件',
+                    '單一畫面顯示',
+                    '資訊即時更新',
+                    '支援快速操作'
+                ],
+                tags: ['R2', '核心', 'T1', '8 點']
+            },
+            'realtime-dashboard': {
+                title: '⭐ 即時儀表板',
+                story: '作為主管，我希望有一個即時更新的儀表板，以便我能一眼掌握團隊狀態。',
+                ac: [
+                    '顯示各階段案件數量',
+                    '顯示 T2 負載狀態',
+                    '超時案件高亮顯示',
+                    '每 5 分鐘自動更新'
+                ],
+                tags: ['R2', '核心', '主管', '5 點']
+            }
+        };
+        
+        // Default story detail
+        const defaultDetail = {
+            title: '功能詳情',
+            story: '作為用戶，我希望能使用此功能。',
+            ac: ['待定義驗收標準'],
+            tags: ['待規劃']
+        };
+        
+        // Release filter
+        const releaseBtns = document.querySelectorAll('.release-btn');
+        const storyMap = document.getElementById('storyMap');
+        
+        releaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                releaseBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const show = this.dataset.show;
+                storyMap.className = 'story-map';
+                if (show === 'mvp') {
+                    storyMap.classList.add('show-mvp');
+                } else if (show === 'r2') {
+                    storyMap.classList.add('show-r2');
+                }
+            });
+        });
+        
+        // Modal
+        const modalOverlay = document.getElementById('modalOverlay');
+        const storyCards = document.querySelectorAll('.story-card');
+        
+        storyCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const storyId = this.dataset.story;
+                const detail = storyDetails[storyId] || {
+                    ...defaultDetail,
+                    title: this.querySelector('div:last-child').textContent
+                };
+                
+                document.getElementById('modalTitle').textContent = detail.title;
+                document.getElementById('modalStory').textContent = detail.story;
+                
+                const acList = document.getElementById('modalAC');
+                acList.innerHTML = detail.ac.map(ac => `<li>${ac}</li>`).join('');
+                
+                const tags = document.getElementById('modalTags');
+                tags.innerHTML = detail.tags.map(tag => `<span class="modal-tag">${tag}</span>`).join('');
+                
+                modalOverlay.classList.add('active');
+            });
+        });
+        
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
