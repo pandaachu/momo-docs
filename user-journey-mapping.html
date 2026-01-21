@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCS 客服系統 User Journey Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        
+        header p {
+            opacity: 0.8;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn.t1 { background: #e3f2fd; color: #1565c0; }
+        .tab-btn.t2-general { background: #e8f5e9; color: #2e7d32; }
+        .tab-btn.t2-senior { background: #fff3e0; color: #e65100; }
+        .tab-btn.manager { background: #f3e5f5; color: #7b1fa2; }
+        .tab-btn.customer { background: #ffebee; color: #c62828; }
+        
+        .tab-btn.active.t1 { background: #1565c0; color: white; }
+        .tab-btn.active.t2-general { background: #2e7d32; color: white; }
+        .tab-btn.active.t2-senior { background: #e65100; color: white; }
+        .tab-btn.active.manager { background: #7b1fa2; color: white; }
+        .tab-btn.active.customer { background: #c62828; color: white; }
+        
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Journey Map Container */
+        .journey-container {
+            display: none;
+        }
+        
+        .journey-container.active {
+            display: block;
+        }
+        
+        /* Persona Header */
+        .persona-header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .persona-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+        
+        .t1 .persona-avatar { background: #e3f2fd; }
+        .t2-general .persona-avatar { background: #e8f5e9; }
+        .t2-senior .persona-avatar { background: #fff3e0; }
+        .manager .persona-avatar { background: #f3e5f5; }
+        .customer .persona-avatar { background: #ffebee; }
+        
+        .persona-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .persona-info .scenario {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .persona-info .goal {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        /* Journey Map */
+        .journey-map {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .journey-header {
+            display: grid;
+            gap: 1px;
+            background: #e0e0e0;
+        }
+        
+        .journey-stages {
+            display: grid;
+            background: #f8f9fa;
+        }
+        
+        .stage-header {
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .stage-header:last-child {
+            border-right: none;
+        }
+        
+        .journey-row {
+            display: grid;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .row-label {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-right: 1px solid #e0e0e0;
+            min-width: 120px;
+        }
+        
+        .journey-cell {
+            padding: 12px 16px;
+            border-right: 1px solid #e0e0e0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .journey-cell:last-child {
+            border-right: none;
+        }
+        
+        /* Emotion Row */
+        .emotion-row .journey-cell {
+            font-size: 1.5rem;
+        }
+        
+        /* Pain Point Highlight */
+        .pain-cell {
+            background: #fff5f5;
+            color: #c62828;
+        }
+        
+        /* Emotion Curve */
+        .emotion-curve {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .emotion-curve h3 {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+        
+        .curve-container {
+            position: relative;
+            height: 200px;
+            border-left: 2px solid #e0e0e0;
+            border-bottom: 2px solid #e0e0e0;
+            margin: 20px 0 20px 60px;
+        }
+        
+        .curve-y-labels {
+            position: absolute;
+            left: -60px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .curve-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .curve-line svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .curve-x-labels {
+            display: grid;
+            margin-left: 60px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* Pain Points & Opportunities */
+        .insights-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .insight-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .insight-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .insight-card.pain h3 {
+            color: #c62828;
+        }
+        
+        .insight-card.opportunity h3 {
+            color: #2e7d32;
+        }
+        
+        .insight-list {
+            list-style: none;
+        }
+        
+        .insight-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .insight-card.pain .insight-item {
+            background: #fff5f5;
+        }
+        
+        .insight-card.opportunity .insight-item {
+            background: #f1f8e9;
+        }
+        
+        .insight-stage {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .insight-card.pain .insight-stage {
+            background: #ffcdd2;
+            color: #b71c1c;
+        }
+        
+        .insight-card.opportunity .insight-stage {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+        
+        .insight-text {
+            font-size: 0.9rem;
+        }
+        
+        /* Service Blueprint */
+        .blueprint-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .blueprint-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .blueprint-swim {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .swim-label {
+            padding: 16px 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .swim-label.customer { background: #ffebee; color: #c62828; }
+        .swim-label.t1 { background: #e3f2fd; color: #1565c0; }
+        .swim-label.t2 { background: #e8f5e9; color: #2e7d32; }
+        .swim-label.manager { background: #f3e5f5; color: #7b1fa2; }
+        
+        .swim-content {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .swim-node {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        
+        .swim-node.customer { background: #ffcdd2; color: #b71c1c; }
+        .swim-node.t1 { background: #bbdefb; color: #0d47a1; }
+        .swim-node.t2 { background: #c8e6c9; color: #1b5e20; }
+        .swim-node.manager { background: #e1bee7; color: #6a1b9a; }
+        
+        .swim-arrow {
+            color: #999;
+        }
+        
+        /* Priority Table */
+        .priority-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .priority-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .priority-table th,
+        .priority-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .priority-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .priority-badge.p0 { background: #ffcdd2; color: #b71c1c; }
+        .priority-badge.p1 { background: #ffe0b2; color: #e65100; }
+        .priority-badge.p2 { background: #fff9c4; color: #f57f17; }
+        .priority-badge.p3 { background: #e0e0e0; color: #616161; }
+        
+        .persona-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+        }
+        
+        .persona-tag.t1 { background: #e3f2fd; color: #1565c0; }
+        .persona-tag.t2 { background: #e8f5e9; color: #2e7d32; }
+        .persona-tag.manager { background: #f3e5f5; color: #7b1fa2; }
+        .persona-tag.customer { background: #ffebee; color: #c62828; }
+        
+        @media (max-width: 1024px) {
+            .insights-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .journey-map {
+                overflow-x: auto;
+            }
+            
+            .journey-stages,
+            .journey-row {
+                min-width: 800px;
+            }
+            
+            .persona-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ User Journey Map</h1>
+            <p>NCS 客服系統 - 使用者旅程地圖</p>
+        </header>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn t1 active" onclick="showJourney('t1')">
+                🔵 T1 小芳
+            </button>
+            <button class="tab-btn t2-general" onclick="showJourney('t2-general')">
+                🟢 T2 小明
+            </button>
+            <button class="tab-btn t2-senior" onclick="showJourney('t2-senior')">
+                🟠 T2 阿華
+            </button>
+            <button class="tab-btn manager" onclick="showJourney('manager')">
+                🟣 主管美玲
+            </button>
+            <button class="tab-btn customer" onclick="showJourney('customer')">
+                🔴 客戶志明
+            </button>
+        </div>
+        
+        <!-- T1 Journey -->
+        <div id="journey-t1" class="journey-container t1 active">
+            <div class="persona-header">
+                <div class="persona-avatar">👩‍💼</div>
+                <div class="persona-info">
+                    <h2>林小芳 - T1 客服專員</h2>
+                    <div class="scenario">場景：接聽客戶來電並建立商談</div>
+                    <div class="goal">🎯 目標：快速理解客戶問題，正確建立商談並轉派給 T2</div>
+                </div>
+            </div>
+            
+            <div class="journey-map">
+                <div class="journey-stages" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="stage-header" style="background:#1565c0; color:white;">階段</div>
+                    <div class="stage-header">1. 接聽來電</div>
+                    <div class="stage-header">2. 理解問題</div>
+                    <div class="stage-header">3. 查詢資料</div>
+                    <div class="stage-header">4. 嘗試解答</div>
+                    <div class="stage-header">5. 建立商談</div>
+                    <div class="stage-header">6. 轉派結案</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">📱 行為</div>
+                    <div class="journey-cell">接聽電話<br>問候客戶</div>
+                    <div class="journey-cell">聽取描述<br>確認問題</div>
+                    <div class="journey-cell pain-cell">切換系統<br>查詢資料</div>
+                    <div class="journey-cell pain-cell">嘗試回答<br>或說明</div>
+                    <div class="journey-cell">填寫商談<br>表單</div>
+                    <div class="journey-cell pain-cell">選擇組別<br>轉派</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">💭 想法</div>
+                    <div class="journey-cell">希望不是<br>難處理的</div>
+                    <div class="journey-cell">這問題<br>我聽過嗎</div>
+                    <div class="journey-cell pain-cell">資料在<br>哪個系統...</div>
+                    <div class="journey-cell pain-cell">不太確定<br>這樣對不對</div>
+                    <div class="journey-cell">要填<br>好多欄位</div>
+                    <div class="journey-cell pain-cell">該派給<br>哪一組？</div>
+                </div>
+                <div class="journey-row emotion-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">😀 情緒</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                </div>
+            </div>
+            
+            <div class="emotion-curve">
+                <h3>📈 情緒曲線</h3>
+                <div class="curve-container">
+                    <div class="curve-y-labels">
+                        <span>😊 高</span>
+                        <span>😐 中</span>
+                        <span>😫 低</span>
+                    </div>
+                    <div class="curve-line">
+                        <svg viewBox="0 0 600 180" preserveAspectRatio="none">
+                            <path d="M 50 60 L 150 60 L 250 120 L 350 140 L 450 150 L 550 100" 
+                                  fill="none" stroke="#1565c0" stroke-width="3"/>
+                            <circle cx="50" cy="60" r="6" fill="#1565c0"/>
+                            <circle cx="150" cy="60" r="6" fill="#1565c0"/>
+                            <circle cx="250" cy="120" r="6" fill="#c62828"/>
+                            <circle cx="350" cy="140" r="6" fill="#c62828"/>
+                            <circle cx="450" cy="150" r="6" fill="#c62828"/>
+                            <circle cx="550" cy="100" r="6" fill="#1565c0"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="curve-x-labels" style="grid-template-columns: repeat(6, 1fr);">
+                    <span>接聽來電</span>
+                    <span>理解問題</span>
+                    <span>查詢資料</span>
+                    <span>嘗試解答</span>
+                    <span>建立商談</span>
+                    <span>轉派結案</span>
+                </div>
+            </div>
+            
+            <div class="insights-section">
+                <div class="insight-card pain">
+                    <h3>😫 痛點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">查詢資料</span>
+                            <span class="insight-text">要切換 3-4 個系統，客戶在線等待</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">嘗試解答</span>
+                            <span class="insight-text">找不到標準答案，怕回答錯誤</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">建立商談</span>
+                            <span class="insight-text">欄位太多，不知道哪些必填</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">轉派結案</span>
+                            <span class="insight-text">不確定該派給哪個 T2 組別</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="insight-card opportunity">
+                    <h3>✨ 機會點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">查詢資料</span>
+                            <span class="insight-text">🎯 整合式客戶檢視頁面</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">嘗試解答</span>
+                            <span class="insight-text">🎯 智慧知識庫搜尋</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">建立商談</span>
+                            <span class="insight-text">🎯 簡化必填欄位、智慧預填</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">轉派結案</span>
+                            <span class="insight-text">🎯 智慧分派建議</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- T2 General Journey -->
+        <div id="journey-t2-general" class="journey-container t2-general">
+            <div class="persona-header">
+                <div class="persona-avatar">👨‍💻</div>
+                <div class="persona-info">
+                    <h2>陳小明 - T2 客服專員（一般）</h2>
+                    <div class="scenario">場景：處理一件退換貨案件</div>
+                    <div class="goal">🎯 目標：在 SLA 時間內完成案件處理，讓客戶滿意</div>
+                </div>
+            </div>
+            
+            <div class="journey-map">
+                <div class="journey-stages" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="stage-header" style="background:#2e7d32; color:white;">階段</div>
+                    <div class="stage-header">1. 收到案件</div>
+                    <div class="stage-header">2. 檢視內容</div>
+                    <div class="stage-header">3. 補充資訊</div>
+                    <div class="stage-header">4. 處理案件</div>
+                    <div class="stage-header">5. 等待回覆</div>
+                    <div class="stage-header">6. 結案回覆</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">📱 行為</div>
+                    <div class="journey-cell">收到分派<br>通知</div>
+                    <div class="journey-cell pain-cell">打開案件<br>檢視內容</div>
+                    <div class="journey-cell pain-cell">聯繫客戶<br>補問資訊</div>
+                    <div class="journey-cell">查詢系統<br>申請退款</div>
+                    <div class="journey-cell pain-cell">等待帳務<br>物流回覆</div>
+                    <div class="journey-cell">通知客戶<br>結案</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">💭 想法</div>
+                    <div class="journey-cell">今天又有<br>多少案件</div>
+                    <div class="journey-cell pain-cell">資訊怎麼<br>這麼少</div>
+                    <div class="journey-cell pain-cell">又要再問<br>一次客戶</div>
+                    <div class="journey-cell">這個流程<br>好複雜</div>
+                    <div class="journey-cell pain-cell">怎麼<br>還沒回</div>
+                    <div class="journey-cell">終於可以<br>結案了</div>
+                </div>
+                <div class="journey-row emotion-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">😀 情緒</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell" style="background:#e8f5e9;">😊</div>
+                </div>
+            </div>
+            
+            <div class="emotion-curve">
+                <h3>📈 情緒曲線</h3>
+                <div class="curve-container">
+                    <div class="curve-y-labels">
+                        <span>😊 高</span>
+                        <span>😐 中</span>
+                        <span>😫 低</span>
+                    </div>
+                    <div class="curve-line">
+                        <svg viewBox="0 0 600 180" preserveAspectRatio="none">
+                            <path d="M 50 60 L 150 100 L 250 150 L 350 60 L 450 130 L 550 20" 
+                                  fill="none" stroke="#2e7d32" stroke-width="3"/>
+                            <circle cx="50" cy="60" r="6" fill="#2e7d32"/>
+                            <circle cx="150" cy="100" r="6" fill="#c62828"/>
+                            <circle cx="250" cy="150" r="6" fill="#c62828"/>
+                            <circle cx="350" cy="60" r="6" fill="#2e7d32"/>
+                            <circle cx="450" cy="130" r="6" fill="#c62828"/>
+                            <circle cx="550" cy="20" r="6" fill="#2e7d32"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="curve-x-labels" style="grid-template-columns: repeat(6, 1fr);">
+                    <span>收到案件</span>
+                    <span>檢視內容</span>
+                    <span>補充資訊</span>
+                    <span>處理案件</span>
+                    <span>等待回覆</span>
+                    <span>結案回覆</span>
+                </div>
+            </div>
+            
+            <div class="insights-section">
+                <div class="insight-card pain">
+                    <h3>😫 痛點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">收到案件</span>
+                            <span class="insight-text">案件量不均，有時太多處理不完</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">檢視內容</span>
+                            <span class="insight-text">T1 建的商談資訊不完整</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">補充資訊</span>
+                            <span class="insight-text">浪費雙方時間，客戶體驗差</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待回覆</span>
+                            <span class="insight-text">等太久會超過 SLA，很焦慮</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="insight-card opportunity">
+                    <h3>✨ 機會點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">收到案件</span>
+                            <span class="insight-text">🎯 自動分派 + 負載平衡</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">檢視內容</span>
+                            <span class="insight-text">🎯 T1 建單時強制填寫關鍵欄位</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">補充資訊</span>
+                            <span class="insight-text">🎯 T1 建單引導問對問題</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待回覆</span>
+                            <span class="insight-text">🎯 內部協作追蹤 + 自動催辦</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- T2 Senior Journey -->
+        <div id="journey-t2-senior" class="journey-container t2-senior">
+            <div class="persona-header">
+                <div class="persona-avatar">👩‍🏫</div>
+                <div class="persona-info">
+                    <h2>張阿華 - T2 資深客服專員</h2>
+                    <div class="scenario">場景：處理一件揚言投訴媒體的重大客訴</div>
+                    <div class="goal">🎯 目標：化解客戶不滿，避免事件升級</div>
+                </div>
+            </div>
+            
+            <div class="journey-map">
+                <div class="journey-stages" style="grid-template-columns: 120px repeat(7, 1fr);">
+                    <div class="stage-header" style="background:#e65100; color:white;">階段</div>
+                    <div class="stage-header">1. 收到案件</div>
+                    <div class="stage-header">2. 研究背景</div>
+                    <div class="stage-header">3. 主動聯繫</div>
+                    <div class="stage-header">4. 傾聽安撫</div>
+                    <div class="stage-header">5. 提出方案</div>
+                    <div class="stage-header">6. 等待簽核</div>
+                    <div class="stage-header">7. 執行結案</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(7, 1fr);">
+                    <div class="row-label">📱 行為</div>
+                    <div class="journey-cell pain-cell">收到重大<br>案件</div>
+                    <div class="journey-cell">查看歷史<br>紀錄</div>
+                    <div class="journey-cell">主動致電<br>客戶</div>
+                    <div class="journey-cell pain-cell">傾聽抱怨<br>表達理解</div>
+                    <div class="journey-cell">評估補償<br>填寫申請</div>
+                    <div class="journey-cell pain-cell">等待主管<br>核准</div>
+                    <div class="journey-cell">回覆客戶<br>追蹤到底</div>
+                </div>
+                <div class="journey-row emotion-row" style="grid-template-columns: 120px repeat(7, 1fr);">
+                    <div class="row-label">😀 情緒</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell" style="background:#e8f5e9;">😊</div>
+                </div>
+            </div>
+            
+            <div class="insights-section">
+                <div class="insight-card pain">
+                    <h3>😫 痛點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">收到案件</span>
+                            <span class="insight-text">困難案件太集中，沒有喘息空間</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">研究背景</span>
+                            <span class="insight-text">歷史記錄分散，要花時間拼湊</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">傾聽安撫</span>
+                            <span class="insight-text">長期情緒勞動造成耗損</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待簽核</span>
+                            <span class="insight-text">簽核流程慢，客戶等不及又升級</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="insight-card opportunity">
+                    <h3>✨ 機會點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">收到案件</span>
+                            <span class="insight-text">🎯 資深客服案件數量上限</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">研究背景</span>
+                            <span class="insight-text">🎯 客戶 360 度檢視頁面</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">傾聽安撫</span>
+                            <span class="insight-text">🎯 情緒支持機制、輪休制度</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待簽核</span>
+                            <span class="insight-text">🎯 授權額度內快速決策</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manager Journey -->
+        <div id="journey-manager" class="journey-container manager">
+            <div class="persona-header">
+                <div class="persona-avatar">👩‍💼</div>
+                <div class="persona-info">
+                    <h2>王美玲 - T2 客服主管</h2>
+                    <div class="scenario">場景：早晨進行案件分派作業</div>
+                    <div class="goal">🎯 目標：快速完成分派，讓團隊開始工作</div>
+                </div>
+            </div>
+            
+            <div class="journey-map">
+                <div class="journey-stages" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="stage-header" style="background:#7b1fa2; color:white;">階段</div>
+                    <div class="stage-header">1. 查看待辦</div>
+                    <div class="stage-header">2. 檢視案件</div>
+                    <div class="stage-header">3. 查看人力</div>
+                    <div class="stage-header">4. 逐件分派</div>
+                    <div class="stage-header">5. 處理特殊</div>
+                    <div class="stage-header">6. 完成分派</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">📱 行為</div>
+                    <div class="journey-cell">登入查看<br>待分派案件</div>
+                    <div class="journey-cell">瀏覽案件<br>類型內容</div>
+                    <div class="journey-cell pain-cell">查看出勤<br>目前負載</div>
+                    <div class="journey-cell pain-cell">一件一件<br>選擇指派</div>
+                    <div class="journey-cell pain-cell">困難案件<br>思考給誰</div>
+                    <div class="journey-cell">確認分派<br>完成</div>
+                </div>
+                <div class="journey-row emotion-row" style="grid-template-columns: 120px repeat(6, 1fr);">
+                    <div class="row-label">😀 情緒</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell" style="background:#e8f5e9;">😊</div>
+                </div>
+            </div>
+            
+            <div class="insights-section">
+                <div class="insight-card pain">
+                    <h3>😫 痛點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">查看人力</span>
+                            <span class="insight-text">要切換到 HR 系統看誰請假</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">逐件分派</span>
+                            <span class="insight-text">重複動作太多，每天花 1-2 小時</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">處理特殊</span>
+                            <span class="insight-text">困難案件不好決定給誰</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">完成分派</span>
+                            <span class="insight-text">下午發現分配不均要調整</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="insight-card opportunity">
+                    <h3>✨ 機會點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">查看人力</span>
+                            <span class="insight-text">🎯 整合出勤資訊到分派介面</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">逐件分派</span>
+                            <span class="insight-text">🎯 自動分派規則引擎</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">處理特殊</span>
+                            <span class="insight-text">🎯 依難度分級自動分派</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">完成分派</span>
+                            <span class="insight-text">🎯 即時負載監控儀表板</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Journey -->
+        <div id="journey-customer" class="journey-container customer">
+            <div class="persona-header">
+                <div class="persona-avatar">🧑</div>
+                <div class="persona-info">
+                    <h2>李志明 - 客戶（金卡會員）</h2>
+                    <div class="scenario">場景：收到瑕疵商品，想要退貨退款</div>
+                    <div class="goal">🎯 目標：快速解決問題，拿回退款</div>
+                </div>
+            </div>
+            
+            <div class="journey-map">
+                <div class="journey-stages" style="grid-template-columns: 120px repeat(8, 1fr);">
+                    <div class="stage-header" style="background:#c62828; color:white;">階段</div>
+                    <div class="stage-header">1. 發現問題</div>
+                    <div class="stage-header">2. 尋找客服</div>
+                    <div class="stage-header">3. 等待接通</div>
+                    <div class="stage-header">4. 說明問題</div>
+                    <div class="stage-header">5. 被轉接</div>
+                    <div class="stage-header">6. 再次說明</div>
+                    <div class="stage-header">7. 等待處理</div>
+                    <div class="stage-header">8. 收到結果</div>
+                </div>
+                <div class="journey-row" style="grid-template-columns: 120px repeat(8, 1fr);">
+                    <div class="row-label">📱 行為</div>
+                    <div class="journey-cell">打開包裹<br>發現瑕疵</div>
+                    <div class="journey-cell pain-cell">找客服<br>入口</div>
+                    <div class="journey-cell pain-cell">打電話<br>等待接聽</div>
+                    <div class="journey-cell">向 T1<br>說明情況</div>
+                    <div class="journey-cell pain-cell">被告知<br>轉專人</div>
+                    <div class="journey-cell pain-cell">向 T2<br>重新說明</div>
+                    <div class="journey-cell pain-cell">等待<br>退款進度</div>
+                    <div class="journey-cell">收到<br>退款通知</div>
+                </div>
+                <div class="journey-row emotion-row" style="grid-template-columns: 120px repeat(8, 1fr);">
+                    <div class="row-label">😀 情緒</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😟</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell">😐</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😫</div>
+                    <div class="journey-cell" style="background:#fff5f5;">😰</div>
+                    <div class="journey-cell" style="background:#e8f5e9;">😊</div>
+                </div>
+            </div>
+            
+            <div class="insights-section">
+                <div class="insight-card pain">
+                    <h3>😫 痛點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">尋找客服</span>
+                            <span class="insight-text">App/網站客服入口不明顯</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待接通</span>
+                            <span class="insight-text">等待時間太長（5-10 分鐘）</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">被轉接</span>
+                            <span class="insight-text">不理解為什麼不能直接處理</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">再次說明</span>
+                            <span class="insight-text">每次轉接都要重新講一遍</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待處理</span>
+                            <span class="insight-text">不知道進度，要主動追問</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="insight-card opportunity">
+                    <h3>✨ 機會點</h3>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-stage">尋找客服</span>
+                            <span class="insight-text">🎯 優化客服入口位置</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待接通</span>
+                            <span class="insight-text">🎯 線上客服分流、回撥服務</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">被轉接</span>
+                            <span class="insight-text">🎯 T1 擴大處理權限</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">再次說明</span>
+                            <span class="insight-text">🎯 案件資訊自動帶入</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-stage">等待處理</span>
+                            <span class="insight-text">🎯 處理進度主動推播</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Service Blueprint -->
+        <div class="blueprint-section">
+            <h3>🔀 服務藍圖：一件退貨案件的完整旅程</h3>
+            <div class="blueprint-swim">
+                <div class="swim-label customer">客戶</div>
+                <div class="swim-content">
+                    <span class="swim-node customer">發現問題</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node customer">聯繫客服</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node customer">說明問題</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node customer">等待處理</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node customer">收到結果</span>
+                </div>
+            </div>
+            <div class="blueprint-swim">
+                <div class="swim-label t1">T1 客服</div>
+                <div class="swim-content">
+                    <span class="swim-node t1">接聽來電</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t1">查詢資料</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t1">建立商談</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t1">轉派 T2</span>
+                </div>
+            </div>
+            <div class="blueprint-swim">
+                <div class="swim-label t2">T2 客服</div>
+                <div class="swim-content">
+                    <span class="swim-node t2">收到案件</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t2">處理案件</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t2">等待內部</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node t2">回覆客戶</span>
+                </div>
+            </div>
+            <div class="blueprint-swim">
+                <div class="swim-label manager">主管</div>
+                <div class="swim-content">
+                    <span class="swim-node manager">分派案件</span>
+                    <span class="swim-arrow">→</span>
+                    <span class="swim-node manager">審核結案</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Priority Table -->
+        <div class="priority-section">
+            <h3>🎯 設計優先級建議</h3>
+            <table class="priority-table">
+                <thead>
+                    <tr>
+                        <th>優先級</th>
+                        <th>改善項目</th>
+                        <th>解決的痛點</th>
+                        <th>影響 Persona</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="priority-badge p0">P0</span></td>
+                        <td>自動分派規則引擎</td>
+                        <td>主管每天 1-2 小時手動分派</td>
+                        <td>
+                            <span class="persona-tag manager">主管</span>
+                            <span class="persona-tag t2">T2</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p0">P0</span></td>
+                        <td>T1 建單強制關鍵欄位</td>
+                        <td>T2 資訊不足要再問客戶</td>
+                        <td>
+                            <span class="persona-tag t1">T1</span>
+                            <span class="persona-tag t2">T2</span>
+                            <span class="persona-tag customer">客戶</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p1">P1</span></td>
+                        <td>整合式客戶檢視</td>
+                        <td>T1 要切換多系統查資料</td>
+                        <td><span class="persona-tag t1">T1</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p1">P1</span></td>
+                        <td>處理進度主動推播</td>
+                        <td>客戶不知道進度</td>
+                        <td><span class="persona-tag customer">客戶</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p1">P1</span></td>
+                        <td>組別 KPI（隱藏個人）</td>
+                        <td>T2 KPI 壓力</td>
+                        <td><span class="persona-tag t2">T2</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p2">P2</span></td>
+                        <td>智慧分派建議</td>
+                        <td>T1 不確定該派給誰</td>
+                        <td><span class="persona-tag t1">T1</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-badge p2">P2</span></td>
+                        <td>資深客服授權額度</td>
+                        <td>簽核流程慢</td>
+                        <td><span class="persona-tag t2">T2 資深</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        function showJourney(type) {
+            // Hide all journeys
+            document.querySelectorAll('.journey-container').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected journey
+            document.getElementById('journey-' + type).classList.add('active');
+            
+            // Add active to selected button
+            document.querySelector('.tab-btn.' + type).classList.add('active');
+        }
+    </script>
+</body>
+</html>
