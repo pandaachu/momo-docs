@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系統流程泳道圖 - Swimlane Diagrams</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab:hover {
+            border-color: #2c5364;
+            color: #2c5364;
+        }
+        
+        .nav-tab.active {
+            background: #2c5364;
+            color: white;
+            border-color: #2c5364;
+        }
+        
+        .swimlane-container {
+            display: none;
+        }
+        
+        .swimlane-container.active {
+            display: block;
+        }
+        
+        .diagram-wrapper {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .diagram-header {
+            background: #2c5364;
+            color: white;
+            padding: 20px 24px;
+        }
+        
+        .diagram-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+        
+        .diagram-header p {
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+        
+        .swimlane-diagram {
+            padding: 24px;
+            overflow-x: auto;
+        }
+        
+        .swimlane {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            min-height: 120px;
+        }
+        
+        .swimlane:last-child {
+            border-bottom: none;
+        }
+        
+        .lane-label {
+            min-width: 120px;
+            max-width: 120px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-right: 2px solid #e0e0e0;
+        }
+        
+        .lane-label .icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .lane-label.customer { background: #fff3e0; color: #e65100; }
+        .lane-label.t1 { background: #e3f2fd; color: #1565c0; }
+        .lane-label.t2 { background: #e8f5e9; color: #2e7d32; }
+        .lane-label.system { background: #f3e5f5; color: #7b1fa2; }
+        .lane-label.external { background: #fce4ec; color: #c2185b; }
+        .lane-label.manager { background: #fff8e1; color: #ff8f00; }
+        .lane-label.warehouse { background: #efebe9; color: #5d4037; }
+        
+        .lane-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+            min-width: 800px;
+        }
+        
+        .flow-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .node {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            min-width: 100px;
+            max-width: 140px;
+            position: relative;
+        }
+        
+        .node.action {
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+        }
+        
+        .node.start {
+            background: #b2ebf2;
+            border: 2px solid #00bcd4;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .node.end {
+            background: #ffcdd2;
+            border: 2px solid #e57373;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .node.decision {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            transform: rotate(0deg);
+            padding: 8px 12px;
+        }
+        
+        .node.decision::before {
+            content: "◇";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #ff9800;
+        }
+        
+        .node.system-action {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+        
+        .node.wait {
+            background: #ffebee;
+            border: 2px dashed #e53935;
+        }
+        
+        .arrow {
+            color: #999;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .arrow.down {
+            transform: rotate(90deg);
+        }
+        
+        .vertical-connector {
+            position: absolute;
+            left: 50%;
+            bottom: -40px;
+            width: 2px;
+            height: 40px;
+            background: #999;
+        }
+        
+        .vertical-connector::after {
+            content: "▼";
+            position: absolute;
+            bottom: -8px;
+            left: -6px;
+            color: #999;
+            font-size: 0.8rem;
+        }
+        
+        .node-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .branch-label {
+            font-size: 0.75rem;
+            color: #666;
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        /* Legend */
+        .legend {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .legend-node {
+            width: 32px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .legend-node.action { background: #fff9c4; border-color: #fbc02d; }
+        .legend-node.system { background: #e3f2fd; border-color: #2196f3; }
+        .legend-node.decision { background: #fff3e0; border-color: #ff9800; }
+        .legend-node.wait { background: #ffebee; border-color: #e53935; border-style: dashed; }
+        .legend-node.start { background: #b2ebf2; border-color: #00bcd4; border-radius: 50%; width: 24px; }
+        .legend-node.end { background: #ffcdd2; border-color: #e57373; border-radius: 50%; width: 24px; }
+        
+        /* Flow Description */
+        .flow-description {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .flow-description h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: #2c5364;
+        }
+        
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #2c5364;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .lane-label {
+                min-width: 80px;
+                max-width: 80px;
+                font-size: 0.8rem;
+            }
+            .node {
+                min-width: 80px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Print */
+        @media print {
+            .nav-tabs { display: none; }
+            .swimlane-container { display: block !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏊 客服系統流程泳道圖</h1>
+            <p>Swimlane Diagrams - 清楚呈現各角色職責與流程</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showDiagram(0)">1️⃣ 客戶售後服務問題</div>
+            <div class="nav-tab" onclick="showDiagram(1)">2️⃣ 指定/變更收送貨日</div>
+            <div class="nav-tab" onclick="showDiagram(2)">3️⃣ 客退異常</div>
+            <div class="nav-tab" onclick="showDiagram(3)">4️⃣ 行銷活動相關問題</div>
+            <div class="nav-tab" onclick="showDiagram(4)">5️⃣ 重大案件</div>
+        </div>
+        
+        <!-- Diagram 1: 客戶售後服務問題 -->
+        <div class="swimlane-container active" id="diagram-0">
+            <div class="diagram-wrapper">
+                <div class="diagram-header">
+                    <h2>流程圖 - 客戶售後服務問題</h2>
+                    <p>客戶反映商品或服務問題的完整處理流程</p>
+                </div>
+                <div class="swimlane-diagram">
+                    <!-- 客戶 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label customer">
+                            <span class="icon">👤</span>
+                            客戶
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node start">開始</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">反映商品/<br>服務問題</div>
+                                <span class="arrow">→</span>
+                                <div class="node wait">等待處理</div>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">收到通知<br>確認服務完成</div>
+                                <span class="arrow">→</span>
+                                <div class="node end">結案</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T1 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t1">
+                            <span class="icon">👩‍💼</span>
+                            T1 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:60px"></div>
+                                <span class="arrow" style="visibility:hidden">→</span>
+                                <div class="node action">接聽/受理<br>記錄問題</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">建立商談</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 系統 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label system">
+                            <span class="icon">⚙️</span>
+                            系統
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:280px"></div>
+                                <div class="node system-action">自動轉件<br>分派規則</div>
+                                <span class="arrow">→</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 供應商 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label external">
+                            <span class="icon">🏭</span>
+                            供應商
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:360px"></div>
+                                <div class="node action">處理案件</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">回覆<br>商談狀態<br>【答覆結束】</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T2 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t2">
+                            <span class="icon">👨‍💼</span>
+                            T2 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:480px"></div>
+                                <div class="node action">審核確認</div>
+                                <span class="arrow">→</span>
+                                <div class="node decision">是否符合<br>客戶需求</div>
+                                <span class="arrow">→</span>
+                                <div class="node-group">
+                                    <div class="branch-label">符合</div>
+                                    <div class="node action">以簡訊或<br>外撥給客戶</div>
+                                </div>
+                                <span class="arrow">→</span>
+                                <div class="node action">商談狀態<br>【結束】</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-description">
+                <h3>📋 流程步驟說明</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="step-number">1</span>
+                        <span>客戶來電/線上反映商品或服務問題</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">2</span>
+                        <span>T1 客服接聽受理，建立商談記錄問題</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">3</span>
+                        <span>系統依分派規則自動轉件給供應商</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">4</span>
+                        <span>供應商處理案件並回覆處理結果</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">5</span>
+                        <span>T2 客服審核確認是否符合客戶需求</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">6</span>
+                        <span>符合則通知客戶，更新商談狀態為結束</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diagram 2: 指定/變更收送貨日 -->
+        <div class="swimlane-container" id="diagram-1">
+            <div class="diagram-wrapper">
+                <div class="diagram-header">
+                    <h2>流程圖 - 指定/變更收(送)貨日</h2>
+                    <p>客戶因配送時間需求通知建立商談</p>
+                </div>
+                <div class="swimlane-diagram">
+                    <!-- 客戶 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label customer">
+                            <span class="icon">👤</span>
+                            客戶
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node start">開始</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">提出配送<br>時間需求</div>
+                                <span class="arrow">→</span>
+                                <div class="node wait">等待處理</div>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">收到通知<br>確認服務完成</div>
+                                <span class="arrow">→</span>
+                                <div class="node end">結案</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T1 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t1">
+                            <span class="icon">👩‍💼</span>
+                            T1 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:60px"></div>
+                                <span class="arrow" style="visibility:hidden">→</span>
+                                <div class="node action">接聽/受理<br>記錄需求</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">建立商談</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T2 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t2">
+                            <span class="icon">👨‍💼</span>
+                            T2 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:280px"></div>
+                                <div class="node action">處理轉件</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">轉給宅配</div>
+                                <span class="arrow">→</span>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">以簡訊或<br>外撥給客戶</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">商談狀態<br>【結束】</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 宅配 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label external">
+                            <span class="icon">🚚</span>
+                            宅配
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:440px"></div>
+                                <div class="node action">處理案件<br>回覆客服</div>
+                                <span class="arrow">↑</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-description">
+                <h3>📋 流程步驟說明</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="step-number">1</span>
+                        <span>客戶來電告知希望指定或變更配送時間</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">2</span>
+                        <span>T1 客服接聽受理，建立商談</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">3</span>
+                        <span>T2 客服處理轉件，轉派給宅配單位</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">4</span>
+                        <span>宅配單位處理並回覆可行性</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">5</span>
+                        <span>T2 客服以簡訊或外撥通知客戶結果</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">6</span>
+                        <span>客戶確認，商談狀態更新為結束</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diagram 3: 客退異常 -->
+        <div class="swimlane-container" id="diagram-2">
+            <div class="diagram-wrapper">
+                <div class="diagram-header">
+                    <h2>流程圖 - 客退異常</h2>
+                    <p>倉庫收到客戶退貨商品不符合退貨規範（不需與客戶協商情境）</p>
+                </div>
+                <div class="swimlane-diagram">
+                    <!-- 客戶 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label customer">
+                            <span class="icon">👤</span>
+                            客戶
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node action" style="opacity:0.5">（已寄出退貨）</div>
+                            </div>
+                            <div style="flex:1; text-align:center; color:#999; font-style:italic;">
+                                此情境客戶不直接參與後續流程
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 倉庫 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label warehouse">
+                            <span class="icon">📦</span>
+                            倉庫
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node start">開始</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">收到退貨<br>發現異常</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">建立商談<br>通報 T2</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">執行銷單</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T2 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t2">
+                            <span class="icon">👨‍💼</span>
+                            T2 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:240px"></div>
+                                <div class="node action">內容確認</div>
+                                <span class="arrow">→</span>
+                                <div class="node decision">是否需與<br>客戶協商</div>
+                                <span class="arrow">→</span>
+                                <div class="node-group">
+                                    <div class="branch-label">否</div>
+                                    <div class="node action">通知銷單處理</div>
+                                </div>
+                                <span class="arrow">→</span>
+                                <div class="node action">【結束】</div>
+                                <span class="arrow">→</span>
+                                <div class="node end">結案</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-description">
+                <h3>📋 流程步驟說明</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="step-number">1</span>
+                        <span>倉庫收到客戶退貨，發現商品異常（已拆封使用、缺件、損傷、非自家商品等）</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">2</span>
+                        <span>倉庫建立商談，通報給 T2 客服</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">3</span>
+                        <span>T2 客服確認內容，判斷是否需與客戶協商</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">4</span>
+                        <span>若不需協商，通知倉庫執行銷單處理</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">5</span>
+                        <span>倉庫執行銷單，流程結案</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diagram 4: 行銷活動相關問題 -->
+        <div class="swimlane-container" id="diagram-3">
+            <div class="diagram-wrapper">
+                <div class="diagram-header">
+                    <h2>流程圖 - 行銷活動相關問題</h2>
+                    <p>客戶行銷活動相關問題</p>
+                </div>
+                <div class="swimlane-diagram">
+                    <!-- 客戶 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label customer">
+                            <span class="icon">👤</span>
+                            客戶
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node start">開始</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">詢問活動<br>相關問題</div>
+                                <span class="arrow">→</span>
+                                <div class="node wait">等待處理</div>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">收到通知<br>確認服務完成</div>
+                                <span class="arrow">→</span>
+                                <div class="node end">結案</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T1 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t1">
+                            <span class="icon">👩‍💼</span>
+                            T1 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:60px"></div>
+                                <span class="arrow" style="visibility:hidden">→</span>
+                                <div class="node action">接聽/受理<br>記錄問題</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">建立商談</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T2 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t2">
+                            <span class="icon">👨‍💼</span>
+                            T2 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:280px"></div>
+                                <div class="node action" style="border-style:dashed;">處理轉件<br>轉給行銷</div>
+                                <span class="arrow">→</span>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">若內容符合客戶需求<br>以簡訊或外撥給客戶</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">商談狀態<br>【結束】</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 行銷窗口 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label external">
+                            <span class="icon">📢</span>
+                            行銷窗口
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:400px"></div>
+                                <div class="node action">mail 回覆<br>處理結果</div>
+                                <span class="arrow">↑</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-description">
+                <h3>📋 流程步驟說明</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="step-number">1</span>
+                        <span>客戶來電詢問行銷活動相關問題</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">2</span>
+                        <span>T1 客服接聽受理，建立商談</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">3</span>
+                        <span>T2 客服處理轉件，轉派給行銷窗口</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">4</span>
+                        <span>行銷窗口以 Email 回覆處理結果</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">5</span>
+                        <span>T2 客服確認內容符合需求後通知客戶</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">6</span>
+                        <span>客戶確認，商談狀態更新為結束</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diagram 5: 重大案件 -->
+        <div class="swimlane-container" id="diagram-4">
+            <div class="diagram-wrapper">
+                <div class="diagram-header">
+                    <h2>流程圖 - 重大案件</h2>
+                    <p>客戶訴求涉及重大案件議題問題</p>
+                </div>
+                <div class="swimlane-diagram">
+                    <!-- 客戶 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label customer">
+                            <span class="icon">👤</span>
+                            客戶
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div class="node start">開始</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">反映重大訴求</div>
+                                <span class="arrow">→</span>
+                                <div class="node wait">等待處理</div>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">收到通知<br>確認服務完成</div>
+                                <span class="arrow">→</span>
+                                <div class="node end">結案</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T1 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t1">
+                            <span class="icon">👩‍💼</span>
+                            T1 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:60px"></div>
+                                <span class="arrow" style="visibility:hidden">→</span>
+                                <div class="node action">接聽/受理<br>識別重大案件</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">建立商談<br>商談狀態【接獲】</div>
+                                <span class="arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- T2 客服 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label t2">
+                            <span class="icon">👨‍💼</span>
+                            T2 客服
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:280px"></div>
+                                <div class="node action" style="border-style:dashed;">處理轉件</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">轉給行銷</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">mail 給<br>『窗口』處理</div>
+                                <span class="arrow">→</span>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="flow-item">
+                                <div class="node action">若內容符合客戶需求<br>以簡訊或外撥給客戶</div>
+                                <span class="arrow">→</span>
+                                <div class="node action">商談狀態<br>【結束】</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 窗口 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label external">
+                            <span class="icon">🏢</span>
+                            窗口
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:520px"></div>
+                                <div class="node action">處理回覆</div>
+                                <span class="arrow">↑</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 廠商 Lane -->
+                    <div class="swimlane">
+                        <div class="lane-label external">
+                            <span class="icon">🏭</span>
+                            廠商
+                        </div>
+                        <div class="lane-content">
+                            <div class="flow-item">
+                                <div style="width:520px"></div>
+                                <div class="node action">廠商協調<br>處理方案</div>
+                            </div>
+                            <div style="flex:1; padding-left:20px;">
+                                <div class="node system-action" style="font-size:0.75rem; max-width:200px;">
+                                    案件若需廠商回覆，皆由系統直接轉件給廠商→廠商回覆→外撥客戶/廠商協調處理方案
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-description">
+                <h3>📋 流程步驟說明</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="step-number">1</span>
+                        <span>客戶來電反映涉及重大議題的訴求</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">2</span>
+                        <span>T1 客服識別為重大案件，建立商談並標記狀態【接獲】</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">3</span>
+                        <span>T2 客服處理轉件，轉派給對應窗口並發送 Email</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">4</span>
+                        <span>窗口單位處理並回覆；若需廠商協助則由系統轉件給廠商</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">5</span>
+                        <span>T2 客服確認內容符合需求後通知客戶</span>
+                    </div>
+                    <div class="flow-step">
+                        <span class="step-number">6</span>
+                        <span>客戶確認，商談狀態更新為結束</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <span class="legend-title">圖例說明：</span>
+            <div class="legend-item">
+                <div class="legend-node start"></div>
+                <span>開始</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node end"></div>
+                <span>結束</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node action"></div>
+                <span>人工動作</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node system"></div>
+                <span>系統動作</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node decision"></div>
+                <span>判斷</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node wait"></div>
+                <span>等待</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showDiagram(index) {
+            document.querySelectorAll('.swimlane-container').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.getElementById('diagram-' + index).classList.add('active');
+            document.querySelectorAll('.nav-tab')[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>
