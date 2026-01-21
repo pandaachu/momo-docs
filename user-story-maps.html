@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系統 User Story Map - 使用者故事地圖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(79, 172, 254, 0.3);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .info-banner {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .info-item {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .info-item h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-item p {
+            font-size: 0.95rem;
+            color: #333;
+        }
+        
+        .release-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .release-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .release-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .release-dot.mvp { background: #4caf50; }
+        .release-dot.r2 { background: #2196f3; }
+        .release-dot.r3 { background: #9c27b0; }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab:hover {
+            border-color: #4facfe;
+            color: #4facfe;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .story-map-container {
+            display: none;
+        }
+        
+        .story-map-container.active {
+            display: block;
+        }
+        
+        .story-map {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+        
+        .map-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 20px 24px;
+        }
+        
+        .map-header h2 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+        
+        .map-header .epic {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        /* Backbone - Activities */
+        .backbone {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+            padding: 16px;
+            gap: 16px;
+            overflow-x: auto;
+        }
+        
+        .activity {
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .activity-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .activity-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+        
+        /* Walking Skeleton Label */
+        .skeleton-label {
+            background: #e8f5e9;
+            padding: 8px 24px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2e7d32;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px dashed #a5d6a7;
+        }
+        
+        /* Stories Grid */
+        .stories-section {
+            padding: 16px;
+        }
+        
+        .release-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        
+        .release-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .release-label {
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 8px;
+        }
+        
+        .release-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+        }
+        
+        .release-tag.mvp { background: #4caf50; }
+        .release-tag.r2 { background: #2196f3; }
+        .release-tag.r3 { background: #9c27b0; }
+        
+        .release-desc {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 4px;
+            text-align: center;
+        }
+        
+        .stories-grid {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        
+        .activity-stories {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .story-card {
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .story-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .story-card.highlight {
+            background: #c8e6c9;
+            border-color: #4caf50;
+        }
+        
+        .story-card.system {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .story-card.external {
+            background: #fce4ec;
+            border-color: #e91e63;
+        }
+        
+        .story-card .story-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .empty-slot {
+            min-height: 40px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        
+        /* Insights Panel */
+        .insights-panel {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .insight-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .insight-card h3 {
+            font-size: 1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .insight-card.scope h3 { color: #1976d2; }
+        .insight-card.mvp-focus h3 { color: #388e3c; }
+        .insight-card.future h3 { color: #7b1fa2; }
+        
+        .insight-list {
+            list-style: none;
+        }
+        
+        .insight-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .insight-list li::before {
+            content: "•";
+            color: #999;
+        }
+        
+        /* Story Card Legend */
+        .card-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .legend-swatch {
+            width: 20px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .legend-swatch.default { background: #fff9c4; border-color: #fbc02d; }
+        .legend-swatch.highlight { background: #c8e6c9; border-color: #4caf50; }
+        .legend-swatch.system { background: #e3f2fd; border-color: #2196f3; }
+        .legend-swatch.external { background: #fce4ec; border-color: #e91e63; }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .info-banner {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .backbone, .stories-grid {
+                flex-direction: column;
+            }
+            .activity, .activity-stories {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ User Story Map 使用者故事地圖</h1>
+            <p>客服系統重構專案 — 需求範圍與優先級規劃</p>
+        </header>
+        
+        <div class="info-banner">
+            <div class="info-item">
+                <h3>📐 什麼是 User Story Map？</h3>
+                <p>一種視覺化工具，將用戶故事按「用戶旅程」（橫軸）和「發布優先級」（縱軸）排列，幫助團隊對齊「做什麼」和「先做什麼」。</p>
+            </div>
+            <div class="info-item">
+                <h3>🎯 Release 版本說明</h3>
+                <div class="release-legend">
+                    <div class="release-badge">
+                        <div class="release-dot mvp"></div>
+                        <span><strong>MVP</strong> = Minimum Viable Product，最小可行產品，核心必做</span>
+                    </div>
+                    <div class="release-badge">
+                        <div class="release-dot r2"></div>
+                        <span><strong>R2</strong> = Release 2，第二版，增強功能</span>
+                    </div>
+                    <div class="release-badge">
+                        <div class="release-dot r3"></div>
+                        <span><strong>R3</strong> = Release 3，第三版，進階優化</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showMap(0)">1️⃣ 客戶售後服務問題</div>
+            <div class="nav-tab" onclick="showMap(1)">2️⃣ 指定/變更收送貨日</div>
+            <div class="nav-tab" onclick="showMap(2)">3️⃣ 客退異常</div>
+            <div class="nav-tab" onclick="showMap(3)">4️⃣ 行銷活動相關問題</div>
+            <div class="nav-tab" onclick="showMap(4)">5️⃣ 重大案件</div>
+        </div>
+        
+        <!-- Story Map 1: 客戶售後服務問題 -->
+        <div class="story-map-container active" id="map-0">
+            <div class="story-map">
+                <div class="map-header">
+                    <h2>客戶售後服務問題</h2>
+                    <div class="epic">Epic: 作為客戶，我希望售後問題能被妥善處理，以便繼續安心使用產品</div>
+                </div>
+                
+                <div class="backbone">
+                    <div class="activity">
+                        <div class="activity-card">
+                            反映問題
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            案件受理
+                            <div class="activity-role">👩‍💼 T1/T2 客服</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            供應商處理
+                            <div class="activity-role">🏭 供應商</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結果確認
+                            <div class="activity-role">👨‍💼 T2 客服</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            服務完成
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-label">↓ Walking Skeleton（可運作的最小功能骨架）</div>
+                
+                <div class="stories-section">
+                    <!-- MVP Row -->
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag mvp">MVP</div>
+                            <div class="release-desc">核心功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    來電/線上反映問題
+                                </div>
+                                <div class="story-card">
+                                    提供訂單資訊
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    建立商談記錄問題
+                                </div>
+                                <div class="story-card">
+                                    判斷並轉派案件
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card external">
+                                    接收案件
+                                    <span class="story-icon">🏭</span>
+                                </div>
+                                <div class="story-card external">
+                                    處理問題
+                                    <span class="story-icon">🏭</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    審核供應商回覆
+                                </div>
+                                <div class="story-card">
+                                    確認符合客戶需求
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    收到處理結果通知
+                                </div>
+                                <div class="story-card">
+                                    確認服務完成
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- R2 Row -->
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r2">R2</div>
+                            <div class="release-desc">增強功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    上傳照片/影片
+                                </div>
+                                <div class="story-card highlight">
+                                    查詢案件進度
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    智能分派建議
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card system">
+                                    SLA 自動提醒
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    處理進度即時同步
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card system">
+                                    逾時自動升級
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    不符合時退回重處理
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- R3 Row -->
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r3">R3</div>
+                            <div class="release-desc">進階優化</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    滿意度評價
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    案件分析報表
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    供應商績效評估
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insight-card mvp-focus">
+                    <h3>🎯 MVP 核心功能</h3>
+                    <ul class="insight-list">
+                        <li>能建立案件並記錄客戶問題</li>
+                        <li>能手動轉派給供應商</li>
+                        <li>供應商能回覆處理結果</li>
+                        <li>能審核並通知客戶</li>
+                    </ul>
+                </div>
+                <div class="insight-card scope">
+                    <h3>🚀 R2 重點：效率提升</h3>
+                    <ul class="insight-list">
+                        <li>智能分派建議減少轉派錯誤</li>
+                        <li>SLA 管理確保處理時效</li>
+                        <li>客戶可自助查詢進度</li>
+                    </ul>
+                </div>
+                <div class="insight-card future">
+                    <h3>✨ R3 願景：持續優化</h3>
+                    <ul class="insight-list">
+                        <li>滿意度回饋閉環</li>
+                        <li>數據驅動的流程優化</li>
+                    </ul>
+                    <div class="card-legend">
+                        <div class="legend-item"><div class="legend-swatch default"></div> 一般功能</div>
+                        <div class="legend-item"><div class="legend-swatch highlight"></div> 改善機會</div>
+                        <div class="legend-item"><div class="legend-swatch system"></div> 系統自動化</div>
+                        <div class="legend-item"><div class="legend-swatch external"></div> 外部單位</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Map 2: 指定/變更收送貨日 -->
+        <div class="story-map-container" id="map-1">
+            <div class="story-map">
+                <div class="map-header">
+                    <h2>指定/變更收送貨日</h2>
+                    <div class="epic">Epic: 作為客戶，我希望能指定或變更配送時間，以便在方便的時間收貨</div>
+                </div>
+                
+                <div class="backbone">
+                    <div class="activity">
+                        <div class="activity-card">
+                            提出需求
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            案件受理
+                            <div class="activity-role">👩‍💼 T1→T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            宅配協調
+                            <div class="activity-role">🚚 宅配</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結果回覆
+                            <div class="activity-role">👨‍💼 T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            完成確認
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-label">↓ Walking Skeleton</div>
+                
+                <div class="stories-section">
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag mvp">MVP</div>
+                            <div class="release-desc">核心功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    告知希望配送時間
+                                </div>
+                                <div class="story-card">
+                                    提供訂單資訊
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    建立商談
+                                </div>
+                                <div class="story-card">
+                                    處理轉件轉給宅配
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card external">
+                                    確認可行性
+                                    <span class="story-icon">🚚</span>
+                                </div>
+                                <div class="story-card external">
+                                    調整配送排程
+                                    <span class="story-icon">🚚</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    簡訊/外撥通知客戶
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    收到確認通知
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r2">R2</div>
+                            <div class="release-desc">增強功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    自助變更配送時間
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card system">
+                                    自動判斷宅配類型
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    系統自動對接宅配 API
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card system">
+                                    即時回覆可行性
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r3">R3</div>
+                            <div class="release-desc">進階優化</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    預約偏好記憶
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    多物流商整合
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    配送評價
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insight-card mvp-focus">
+                    <h3>🎯 MVP 核心功能</h3>
+                    <ul class="insight-list">
+                        <li>能記錄客戶的配送時間需求</li>
+                        <li>能手動轉派給宅配單位</li>
+                        <li>能回覆客戶確認結果</li>
+                    </ul>
+                </div>
+                <div class="insight-card scope">
+                    <h3>🚀 R2 重點：自助與自動化</h3>
+                    <ul class="insight-list">
+                        <li>客戶可自助變更（減少人工）</li>
+                        <li>串接宅配 API（即時回覆）</li>
+                        <li>系統自動判斷物流商</li>
+                    </ul>
+                </div>
+                <div class="insight-card future">
+                    <h3>✨ R3 願景</h3>
+                    <ul class="insight-list">
+                        <li>記住客戶偏好的收貨時段</li>
+                        <li>支援多家物流商比價選擇</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Map 3: 客退異常 -->
+        <div class="story-map-container" id="map-2">
+            <div class="story-map">
+                <div class="map-header">
+                    <h2>客退異常</h2>
+                    <div class="epic">Epic: 作為倉庫人員，我希望異常退貨能被妥善處理，以便維持退貨流程順暢</div>
+                </div>
+                
+                <div class="backbone">
+                    <div class="activity">
+                        <div class="activity-card">
+                            發現異常
+                            <div class="activity-role">📦 倉庫</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            通報客服
+                            <div class="activity-role">📦 倉庫→T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            判斷處理
+                            <div class="activity-role">👨‍💼 T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            執行處理
+                            <div class="activity-role">依判斷結果</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結案歸檔
+                            <div class="activity-role">👨‍💼 T2</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-label">↓ Walking Skeleton</div>
+                
+                <div class="stories-section">
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag mvp">MVP</div>
+                            <div class="release-desc">核心功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    收到退貨發現異常
+                                </div>
+                                <div class="story-card">
+                                    記錄異常類型
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    建立商談通報 T2
+                                </div>
+                                <div class="story-card">
+                                    附上照片/說明
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    內容確認
+                                </div>
+                                <div class="story-card">
+                                    判斷是否需協商
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    通知銷單處理
+                                </div>
+                                <div class="story-card external">
+                                    銷單執行
+                                    <span class="story-icon">📦</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    結案
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r2">R2</div>
+                            <div class="release-desc">增強功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    異常類型標準化選單
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    掃描條碼自動帶入訂單
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card system">
+                                    自動路由到 T2
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    判斷決策樹輔助
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    協商流程追蹤
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r3">R3</div>
+                            <div class="release-desc">進階優化</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    AI 圖像辨識異常
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    異常類型統計分析
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    退貨品質報表
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insight-card mvp-focus">
+                    <h3>🎯 MVP 核心功能</h3>
+                    <ul class="insight-list">
+                        <li>倉庫能建立異常通報</li>
+                        <li>T2 能判斷處理方式</li>
+                        <li>能追蹤到結案</li>
+                    </ul>
+                </div>
+                <div class="insight-card scope">
+                    <h3>🚀 R2 重點：標準化與效率</h3>
+                    <ul class="insight-list">
+                        <li>異常類型標準化（一致性）</li>
+                        <li>條碼掃描（減少人工輸入）</li>
+                        <li>決策樹輔助（減少判斷錯誤）</li>
+                    </ul>
+                </div>
+                <div class="insight-card future">
+                    <h3>✨ R3 願景</h3>
+                    <ul class="insight-list">
+                        <li>AI 自動辨識異常類型</li>
+                        <li>數據分析預防異常</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Map 4: 行銷活動相關問題 -->
+        <div class="story-map-container" id="map-3">
+            <div class="story-map">
+                <div class="map-header">
+                    <h2>行銷活動相關問題</h2>
+                    <div class="epic">Epic: 作為客戶，我希望行銷活動問題能被解答，以便正確使用優惠</div>
+                </div>
+                
+                <div class="backbone">
+                    <div class="activity">
+                        <div class="activity-card">
+                            詢問活動
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            案件受理
+                            <div class="activity-role">👩‍💼 T1→T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            行銷確認
+                            <div class="activity-role">📢 行銷窗口</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結果回覆
+                            <div class="activity-role">👨‍💼 T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            完成確認
+                            <div class="activity-role">👤 客戶</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-label">↓ Walking Skeleton</div>
+                
+                <div class="stories-section">
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag mvp">MVP</div>
+                            <div class="release-desc">核心功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    詢問活動問題
+                                </div>
+                                <div class="story-card">
+                                    提供活動名稱/內容
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    建立商談
+                                </div>
+                                <div class="story-card">
+                                    處理轉件轉給行銷
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card external">
+                                    收到 mail
+                                    <span class="story-icon">📢</span>
+                                </div>
+                                <div class="story-card external">
+                                    確認活動規則回覆
+                                    <span class="story-icon">📢</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    簡訊/外撥通知客戶
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    收到回覆確認完成
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r2">R2</div>
+                            <div class="release-desc">增強功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    常見活動 FAQ 自助查詢
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    活動知識庫查詢
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card">
+                                    T1 直接回答常見問題
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card system">
+                                    行銷直接在系統中回覆
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r3">R3</div>
+                            <div class="release-desc">進階優化</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    智能客服自動回答
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    活動上線自動同步知識庫
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    活動問題統計分析
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insight-card mvp-focus">
+                    <h3>🎯 MVP 核心功能</h3>
+                    <ul class="insight-list">
+                        <li>能記錄活動相關問題</li>
+                        <li>能轉派給行銷窗口</li>
+                        <li>能回覆客戶結果</li>
+                    </ul>
+                </div>
+                <div class="insight-card scope">
+                    <h3>🚀 R2 重點：減少轉派</h3>
+                    <ul class="insight-list">
+                        <li>客戶自助 FAQ（減少來電）</li>
+                        <li>T1 可查知識庫直接回答</li>
+                        <li>行銷在系統內回覆（不用 Email）</li>
+                    </ul>
+                </div>
+                <div class="insight-card future">
+                    <h3>✨ R3 願景</h3>
+                    <ul class="insight-list">
+                        <li>智能客服自動回答活動問題</li>
+                        <li>活動上線時自動更新知識庫</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Map 5: 重大案件 -->
+        <div class="story-map-container" id="map-4">
+            <div class="story-map">
+                <div class="map-header">
+                    <h2>重大案件</h2>
+                    <div class="epic">Epic: 作為客服主管，我希望重大案件能被快速妥善處理，以降低公司風險</div>
+                </div>
+                
+                <div class="backbone">
+                    <div class="activity">
+                        <div class="activity-card">
+                            案件識別
+                            <div class="activity-role">👩‍💼 T1</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            案件升級
+                            <div class="activity-role">👩‍💼 T1→T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            專責處理
+                            <div class="activity-role">🏢 窗口單位</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結果回覆
+                            <div class="activity-role">👨‍💼 T2</div>
+                        </div>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-card">
+                            結案追蹤
+                            <div class="activity-role">👔 主管</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-label">↓ Walking Skeleton</div>
+                
+                <div class="stories-section">
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag mvp">MVP</div>
+                            <div class="release-desc">核心功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    識別重大案件
+                                </div>
+                                <div class="story-card">
+                                    初步安撫客戶
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    建立商談狀態【接獲】
+                                </div>
+                                <div class="story-card">
+                                    處理轉件/mail 給窗口
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card external">
+                                    處理回覆
+                                    <span class="story-icon">🏢</span>
+                                </div>
+                                <div class="story-card external">
+                                    廠商協調處理方案
+                                    <span class="story-icon">🏭</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    確認符合需求
+                                </div>
+                                <div class="story-card">
+                                    通知客戶
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    結案報告
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r2">R2</div>
+                            <div class="release-desc">增強功能</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    關鍵字自動標記重大
+                                    <span class="story-icon">💡</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    自動通知主管
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card system">
+                                    系統直接轉件給廠商
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card highlight">
+                                    處理時限監控
+                                    <span class="story-icon">💡</span>
+                                </div>
+                                <div class="story-card system">
+                                    逾時自動升級
+                                    <span class="story-icon">⚙️</span>
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    案件分析
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="release-row">
+                        <div class="release-label">
+                            <div class="release-tag r3">R3</div>
+                            <div class="release-desc">進階優化</div>
+                        </div>
+                        <div class="stories-grid">
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    AI 情緒分析自動識別
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    風險評分機制
+                                </div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="empty-slot">—</div>
+                            </div>
+                            <div class="activity-stories">
+                                <div class="story-card">
+                                    重大案件根因分析報表
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insight-card mvp-focus">
+                    <h3>🎯 MVP 核心功能</h3>
+                    <ul class="insight-list">
+                        <li>能人工識別並標記重大案件</li>
+                        <li>能轉派給專責窗口處理</li>
+                        <li>能產出結案報告</li>
+                    </ul>
+                </div>
+                <div class="insight-card scope">
+                    <h3>🚀 R2 重點：即時監控</h3>
+                    <ul class="insight-list">
+                        <li>關鍵字自動識別（不漏接）</li>
+                        <li>主管即時收到通知</li>
+                        <li>SLA 監控與自動升級</li>
+                    </ul>
+                </div>
+                <div class="insight-card future">
+                    <h3>✨ R3 願景</h3>
+                    <ul class="insight-list">
+                        <li>AI 情緒分析提前預警</li>
+                        <li>風險評分自動分級</li>
+                        <li>根因分析預防再發</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        function showMap(index) {
+            document.querySelectorAll('.story-map-container').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.getElementById('map-' + index).classList.add('active');
+            document.querySelectorAll('.nav-tab')[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>
