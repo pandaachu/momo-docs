@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服系統服務藍圖 - Service Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 12px;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .blueprint-container {
+            display: none;
+        }
+        
+        .blueprint-container.active {
+            display: block;
+        }
+        
+        .blueprint-title {
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px 12px 0 0;
+            font-size: 1.1rem;
+        }
+        
+        .blueprint-subtitle {
+            background: #444;
+            color: #ccc;
+            padding: 8px 24px;
+            font-size: 0.85rem;
+        }
+        
+        .blueprint {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .blueprint-row {
+            display: grid;
+            grid-template-columns: 160px repeat(6, 1fr);
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .blueprint-row:last-child {
+            border-bottom: none;
+        }
+        
+        .row-label {
+            background: #f8f9fa;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            border-right: 2px solid #e0e0e0;
+        }
+        
+        .row-label.physical { background: #e3f2fd; color: #1565c0; }
+        .row-label.customer { background: #fff3e0; color: #e65100; }
+        .row-label.frontstage { background: #e8f5e9; color: #2e7d32; }
+        .row-label.backstage { background: #fce4ec; color: #c2185b; }
+        .row-label.support { background: #f3e5f5; color: #7b1fa2; }
+        
+        .blueprint-cell {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100px;
+            border-right: 1px dashed #e0e0e0;
+            position: relative;
+        }
+        
+        .blueprint-cell:last-child {
+            border-right: none;
+        }
+        
+        .action-box {
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            max-width: 140px;
+            position: relative;
+        }
+        
+        .action-box.decision {
+            background: #ffecb3;
+            border-color: #ff9800;
+            transform: rotate(0deg);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-box.waiting {
+            border-style: dashed;
+            background: #ffebee;
+            border-color: #e53935;
+        }
+        
+        .action-box.system {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+        
+        .pain-point {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f44336;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .line-separator {
+            grid-column: 1 / -1;
+            padding: 8px 24px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .line-interaction {
+            background: linear-gradient(90deg, #2196f3, #03a9f4);
+            color: white;
+        }
+        
+        .line-visibility {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+            color: #333;
+        }
+        
+        .line-internal {
+            background: linear-gradient(90deg, #9c27b0, #e91e63);
+            color: white;
+        }
+        
+        .arrow {
+            color: #999;
+            font-size: 1.5rem;
+        }
+        
+        .insights-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .insights-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .insights-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+        
+        .insights-card.pain h3 {
+            color: #e53935;
+        }
+        
+        .insights-card.opportunity h3 {
+            color: #43a047;
+        }
+        
+        .insights-list {
+            list-style: none;
+        }
+        
+        .insights-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+        
+        .insights-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .legend {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .legend-box {
+            width: 40px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .legend-box.action { background: #fff9c4; border-color: #fbc02d; }
+        .legend-box.system { background: #e3f2fd; border-color: #1976d2; }
+        .legend-box.waiting { background: #ffebee; border-color: #e53935; border-style: dashed; }
+        
+        @media (max-width: 1200px) {
+            .blueprint-row {
+                grid-template-columns: 120px repeat(6, 1fr);
+            }
+            .action-box {
+                max-width: 100px;
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .blueprint {
+                overflow-x: auto;
+            }
+            .blueprint-row {
+                min-width: 900px;
+            }
+            .insights-panel {
+                grid-template-columns: 1fr;
+            }
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ 客服系統服務藍圖 Service Blueprint</h1>
+            <p>參考 Service Design: From Insight to Implementation (Polaine, Løvlie, & Reason) 方法論</p>
+        </header>
+        
+        <div class="legend">
+            <span class="legend-title">圖例說明：</span>
+            <div class="legend-item">
+                <div class="legend-box action"></div>
+                <span>一般動作</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box system"></div>
+                <span>系統/自動化</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box waiting"></div>
+                <span>等待/延遲</span>
+            </div>
+            <div class="legend-item">
+                <span style="background:#f44336;color:white;padding:2px 8px;border-radius:10px;font-size:12px;">⚡</span>
+                <span>痛點</span>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showBlueprint(0)">1️⃣ 客戶售後服務問題</div>
+            <div class="nav-tab" onclick="showBlueprint(1)">2️⃣ 指定/變更收送貨日</div>
+            <div class="nav-tab" onclick="showBlueprint(2)">3️⃣ 客退異常</div>
+            <div class="nav-tab" onclick="showBlueprint(3)">4️⃣ 行銷活動相關問題</div>
+            <div class="nav-tab" onclick="showBlueprint(4)">5️⃣ 重大案件</div>
+        </div>
+        
+        <!-- Blueprint 1: 客戶售後服務問題 -->
+        <div class="blueprint-container active" id="blueprint-0">
+            <div class="blueprint">
+                <div class="blueprint-title">服務藍圖：客戶售後服務問題</div>
+                <div class="blueprint-subtitle">流程：T1 客服 → T2 客服 → 系統 → 供應商</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label physical">📦 實體證據<br>Physical Evidence</div>
+                    <div class="blueprint-cell">電話/App/<br>網頁客服</div>
+                    <div class="blueprint-cell">案件編號通知</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">簡訊/電話通知</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label customer">👤 顧客行為<br>Customer Actions</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">反映商品/服務問題</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">
+                            等待處理中
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">收到處理結果通知</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">確認完成</div>
+                    </div>
+                </div>
+                
+                <div class="line-separator line-interaction">↑ Line of Interaction 互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label frontstage">👩‍💼 前台 T1<br>Frontstage</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">接聽/受理<br>記錄問題</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            建立商談<br>↓ 轉派
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-visibility">↑ Line of Visibility 可見線 — 客戶看不到以下流程</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage">👨‍💼 後台 T2<br>Backstage</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">
+                            審核確認<br>供應商回覆
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">確認是否<br>符合需求<br>◇ 是/否</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">簡訊/外撥<br>通知客戶</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">商談狀態<br>【結束】</div>
+                    </div>
+                </div>
+                
+                <div class="line-separator line-internal">↑ Line of Internal Interaction 內部互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label support">⚙️ 支援流程<br>Support</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box system">系統：<br>自動轉件<br>分派規則</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            供應商：<br>處理案件<br>回覆結果
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insights-card pain">
+                    <h3>⚡ 痛點 Pain Points</h3>
+                    <ul class="insights-list">
+                        <li><strong>P1:</strong> T1 轉派判斷困難 — 缺乏智能建議，依賴經驗</li>
+                        <li><strong>P2:</strong> 客戶等待時間長 — 無法即時追蹤進度</li>
+                        <li><strong>P3:</strong> 供應商回覆時間不可控 — 缺乏 SLA 管理機制</li>
+                        <li><strong>P4:</strong> T2 審核時資訊不完整 — 需要反覆確認</li>
+                    </ul>
+                </div>
+                <div class="insights-card opportunity">
+                    <h3>💡 改善機會 Opportunities</h3>
+                    <ul class="insights-list">
+                        <li><strong>O1:</strong> 智能分派建議 — 根據案件內容自動建議轉派對象</li>
+                        <li><strong>O2:</strong> 進度透明化 — 讓客戶可查詢案件處理進度</li>
+                        <li><strong>O3:</strong> SLA 管理 — 設定供應商回覆時限，逾時自動提醒</li>
+                        <li><strong>O4:</strong> 結構化資料 — 建立案件必填欄位確保資訊完整</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blueprint 2: 指定/變更收送貨日 -->
+        <div class="blueprint-container" id="blueprint-1">
+            <div class="blueprint">
+                <div class="blueprint-title">服務藍圖：指定/變更收送貨日</div>
+                <div class="blueprint-subtitle">客戶因配送時間需求通知建立商談</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label physical">📦 實體證據</div>
+                    <div class="blueprint-cell">電話/App</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">簡訊/電話通知</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label customer">👤 顧客行為</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">提出配送<br>時間需求</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">
+                            等待
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">收到確認通知</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">依新時間<br>等待收貨</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-interaction">↑ Line of Interaction 互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label frontstage">👩‍💼 前台 T1</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">接聽/受理<br>記錄需求</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">建立商談<br>↓</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-visibility">↑ Line of Visibility 可見線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage">👨‍💼 後台 T2</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">處理轉件<br>轉給宅配</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">簡訊/外撥<br>通知客戶</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">商談狀態<br>【結束】</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-internal">↑ Line of Internal Interaction 內部互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label support">🚚 宅配單位</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            處理案件<br>回覆客服
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insights-card pain">
+                    <h3>⚡ 痛點</h3>
+                    <ul class="insights-list">
+                        <li><strong>P1:</strong> 流程經過多手，處理時間長</li>
+                        <li><strong>P2:</strong> T2↔宅配 人工協調效率低</li>
+                        <li><strong>P3:</strong> 客戶無法即時知道是否可行</li>
+                    </ul>
+                </div>
+                <div class="insights-card opportunity">
+                    <h3>💡 改善機會</h3>
+                    <ul class="insights-list">
+                        <li><strong>O1:</strong> 客戶自助變更（如果訂單狀態允許）</li>
+                        <li><strong>O2:</strong> 系統與宅配 API 串接，自動查詢可配送時段</li>
+                        <li><strong>O3:</strong> 即時回覆可行性，減少等待</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blueprint 3: 客退異常 -->
+        <div class="blueprint-container" id="blueprint-2">
+            <div class="blueprint">
+                <div class="blueprint-title">服務藍圖：客退異常</div>
+                <div class="blueprint-subtitle">倉庫收到客戶退貨商品不符合退貨規範（不需與客戶協商情境）</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label physical">📦 實體證據</div>
+                    <div class="blueprint-cell">退貨商品<br>異常狀態</div>
+                    <div class="blueprint-cell">異常照片記錄</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label customer">👤 顧客行為</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box" style="opacity:0.5">(客戶已<br>寄出退貨)</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-interaction">↑ Line of Interaction（此情境客戶不直接參與後續流程）</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label frontstage">👩‍💼 前台</div>
+                    <div class="blueprint-cell" colspan="6" style="color:#999;font-style:italic;">
+                        本案無前台互動
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-visibility">↑ Line of Visibility 可見線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage">👨‍💼 後台 T2</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            內容確認
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">判斷是否<br>需與客戶協商<br>◇ 是/否</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">通知銷單處理</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">【結束】</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-internal">↑ Line of Internal Interaction 內部互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label support">📦 倉庫</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            收到退貨<br>建立商談
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">執行銷單</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insights-card pain">
+                    <h3>⚡ 痛點</h3>
+                    <ul class="insights-list">
+                        <li><strong>P1:</strong> 倉庫手動建立商談耗時</li>
+                        <li><strong>P2:</strong> 異常類型描述不一致</li>
+                        <li><strong>P3:</strong> T2 確認時資訊可能不足</li>
+                        <li><strong>P4:</strong> 判斷標準不明確</li>
+                    </ul>
+                </div>
+                <div class="insights-card opportunity">
+                    <h3>💡 改善機會</h3>
+                    <ul class="insights-list">
+                        <li><strong>O1:</strong> 掃描條碼自動帶入訂單資訊</li>
+                        <li><strong>O2:</strong> 標準化異常類型選單</li>
+                        <li><strong>O3:</strong> 必填欄位：異常類型、照片、訂單號</li>
+                        <li><strong>O4:</strong> 建立判斷決策樹</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blueprint 4: 行銷活動相關問題 -->
+        <div class="blueprint-container" id="blueprint-3">
+            <div class="blueprint">
+                <div class="blueprint-title">服務藍圖：行銷活動相關問題</div>
+                <div class="blueprint-subtitle">客戶行銷活動相關問題</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label physical">📦 實體證據</div>
+                    <div class="blueprint-cell">電話/App<br>活動頁面</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">簡訊/電話通知</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label customer">👤 顧客行為</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">詢問活動問題</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">
+                            等待
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">收到處理<br>結果通知</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">依回覆<br>使用優惠</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-interaction">↑ Line of Interaction 互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label frontstage">👩‍💼 前台 T1</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            接聽/受理
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">建立商談<br>↓</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-visibility">↑ Line of Visibility 可見線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage">👨‍💼 後台 T2</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">處理轉件<br>轉給行銷</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">等待行銷回覆</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">若符合需求<br>通知客戶</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">商談狀態<br>【結束】</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-internal">↑ Line of Internal Interaction 內部互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label support">📢 行銷窗口</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            mail 回覆<br>處理結果
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insights-card pain">
+                    <h3>⚡ 痛點</h3>
+                    <ul class="insights-list">
+                        <li><strong>P1:</strong> T1 無法直接回答活動問題</li>
+                        <li><strong>P2:</strong> 需要轉行銷窗口，流程長</li>
+                        <li><strong>P3:</strong> T2↔行銷 用 Email 溝通效率低</li>
+                        <li><strong>P4:</strong> 活動規則複雜，容易答錯</li>
+                    </ul>
+                </div>
+                <div class="insights-card opportunity">
+                    <h3>💡 改善機會</h3>
+                    <ul class="insights-list">
+                        <li><strong>O1:</strong> 建立活動知識庫，T1 可自行查詢</li>
+                        <li><strong>O2:</strong> 常見問題 FAQ，客戶可自助查詢</li>
+                        <li><strong>O3:</strong> 行銷窗口直接在系統中回覆</li>
+                        <li><strong>O4:</strong> 活動上線時同步更新知識庫</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blueprint 5: 重大案件 -->
+        <div class="blueprint-container" id="blueprint-4">
+            <div class="blueprint">
+                <div class="blueprint-title">服務藍圖：重大案件</div>
+                <div class="blueprint-subtitle">客戶訴求涉及重大案件議題問題</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label physical">📦 實體證據</div>
+                    <div class="blueprint-cell">電話/App</div>
+                    <div class="blueprint-cell">案件編號<br>(標記重大)</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">簡訊/電話通知</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label customer">👤 顧客行為</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">反映重大訴求</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">等待處理中</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">收到處理<br>結果通知</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">確認完成</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-interaction">↑ Line of Interaction 互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label frontstage">👩‍💼 前台 T1</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">
+                            接聽/受理<br>識別重大案件
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">建立商談<br>狀態【接獲】</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-visibility">↑ Line of Visibility 可見線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage">👨‍💼 後台 T2</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">處理轉件<br>mail 給窗口</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">若符合需求<br>通知客戶</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">商談狀態<br>【結束】</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label backstage" style="background:#fff0f0;color:#c62828;">👔 客服主管</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box waiting">
+                            ⚠️ 應即時<br>收到通知
+                            <div class="pain-point">⚡</div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">監控處理進度</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">確認結案品質</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">案件分析</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+                
+                <div class="line-separator line-internal">↑ Line of Internal Interaction 內部互動線</div>
+                
+                <div class="blueprint-row">
+                    <div class="row-label support">🏢 窗口/廠商</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">
+                        <div class="action-box system">系統直接<br>轉件給廠商</div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="action-box">窗口：處理回覆<br>廠商：協調方案</div>
+                    </div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                    <div class="blueprint-cell">-</div>
+                </div>
+            </div>
+            
+            <div class="insights-panel">
+                <div class="insights-card pain">
+                    <h3>⚡ 痛點</h3>
+                    <ul class="insights-list">
+                        <li><strong>P1:</strong> T1 識別重大案件困難</li>
+                        <li><strong>P2:</strong> 主管無法即時知道重大案件</li>
+                        <li><strong>P3:</strong> 重大案件處理時限難以追蹤</li>
+                        <li><strong>P4:</strong> 缺乏重大案件分析</li>
+                    </ul>
+                </div>
+                <div class="insights-card opportunity">
+                    <h3>💡 改善機會</h3>
+                    <ul class="insights-list">
+                        <li><strong>O1:</strong> 關鍵字偵測自動標記（法律、投訴、媒體...）</li>
+                        <li><strong>O2:</strong> 重大案件自動推播通知主管</li>
+                        <li><strong>O3:</strong> 設定較短 SLA，逾時自動升級</li>
+                        <li><strong>O4:</strong> 重大案件專屬報表與根因分析</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        function showBlueprint(index) {
+            // Hide all blueprints
+            document.querySelectorAll('.blueprint-container').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected blueprint
+            document.getElementById('blueprint-' + index).classList.add('active');
+            
+            // Add active to selected tab
+            document.querySelectorAll('.nav-tab')[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>
