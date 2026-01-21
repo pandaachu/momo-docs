@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCS 客服系統 Persona</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        
+        .persona-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .persona-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .persona-header {
+            padding: 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .persona-card.t1 .persona-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .persona-card.t2-general .persona-header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        
+        .persona-card.t2-senior .persona-header {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        }
+        
+        .persona-card.manager .persona-header {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+        
+        .persona-card.customer .persona-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+        
+        .persona-info h2 {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+        
+        .persona-info .role {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .persona-info .meta {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .persona-body {
+            padding: 24px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .quote {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .persona-card.t1 .quote { border-left-color: #3498db; }
+        .persona-card.t2-general .quote { border-left-color: #2ecc71; }
+        .persona-card.t2-senior .quote { border-left-color: #e67e22; }
+        .persona-card.manager .quote { border-left-color: #9b59b6; }
+        .persona-card.customer .quote { border-left-color: #e74c3c; }
+        
+        .goals-list, .pains-list, .needs-list {
+            list-style: none;
+        }
+        
+        .goals-list li, .pains-list li, .needs-list li {
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 0.95rem;
+        }
+        
+        .goals-list li::before {
+            content: "🎯";
+            position: absolute;
+            left: 0;
+        }
+        
+        .pains-list li::before {
+            content: "😫";
+            position: absolute;
+            left: 0;
+        }
+        
+        .needs-list li::before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+        
+        .scenario {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .scenario-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .scenario-steps {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .scenario-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        
+        .step-num {
+            background: #e0e0e0;
+            color: #666;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .persona-card.t1 .tag { background: #e3f2fd; color: #1565c0; }
+        .persona-card.t2-general .tag { background: #e8f5e9; color: #2e7d32; }
+        .persona-card.t2-senior .tag { background: #fff3e0; color: #e65100; }
+        .persona-card.manager .tag { background: #f3e5f5; color: #7b1fa2; }
+        .persona-card.customer .tag { background: #ffebee; color: #c62828; }
+        
+        /* Comparison Table */
+        .comparison-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .comparison-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .comparison-table th:first-child {
+            width: 120px;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .color-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .color-dot.blue { background: #3498db; }
+        .color-dot.green { background: #2ecc71; }
+        .color-dot.orange { background: #e67e22; }
+        .color-dot.purple { background: #9b59b6; }
+        .color-dot.red { background: #e74c3c; }
+        
+        /* Design Insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .insight-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .insight-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .insight-card p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        @media print {
+            .persona-card {
+                break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .persona-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .persona-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 NCS 客服系統 Persona</h1>
+            <p>了解使用者，設計更好的系統</p>
+        </header>
+        
+        <div class="persona-grid">
+            <!-- T1 客服 -->
+            <div class="persona-card t1">
+                <div class="persona-header">
+                    <div class="avatar">👩‍💼</div>
+                    <div class="persona-info">
+                        <h2>林小芳</h2>
+                        <div class="role">T1 客服專員</div>
+                        <div class="meta">24 歲 · 年資 1 年</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="section">
+                        <div class="section-title">💬 代表引述</div>
+                        <div class="quote">
+                            「有時候客戶問的問題我不太確定答案，但又不好意思讓客戶等太久。如果有個知識庫可以快速搜尋就好了。」
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🎯 工作目標</div>
+                        <ul class="goals-list">
+                            <li>快速理解客戶問題並提供解答</li>
+                            <li>正確判斷案件類型並轉派 T2</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">😫 主要痛點</div>
+                        <ul class="pains-list">
+                            <li>資訊散落，要切換多個系統</li>
+                            <li>不確定案件該分給哪個組別</li>
+                            <li>遇到不熟悉的問題要到處問人</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">✨ 需求</div>
+                        <ul class="needs-list">
+                            <li>整合式介面</li>
+                            <li>智慧分派建議</li>
+                            <li>知識庫搜尋</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tags">
+                        <span class="tag">第一線</span>
+                        <span class="tag">資訊整合</span>
+                        <span class="tag">判斷輔助</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- T2 一般客服 -->
+            <div class="persona-card t2-general">
+                <div class="persona-header">
+                    <div class="avatar">👨‍💻</div>
+                    <div class="persona-info">
+                        <h2>陳小明</h2>
+                        <div class="role">T2 客服專員（一般）</div>
+                        <div class="meta">28 歲 · 年資 2 年 · 退換貨組</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="section">
+                        <div class="section-title">💬 代表引述</div>
+                        <div class="quote">
+                            「最怕收到資訊不完整的案件，還要再打給客戶問一次，客戶也會覺得煩。」
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🎯 工作目標</div>
+                        <ul class="goals-list">
+                            <li>每日處理分派到的案件</li>
+                            <li>在 SLA 時間內回覆客戶</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">😫 主要痛點</div>
+                        <ul class="pains-list">
+                            <li>案件量分配不均</li>
+                            <li>T1 建的商談常缺資訊</li>
+                            <li>公開個人 KPI 造成壓力</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">✨ 需求</div>
+                        <ul class="needs-list">
+                            <li>案件自動分派</li>
+                            <li>完整商談資訊</li>
+                            <li>隱藏個人 KPI</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tags">
+                        <span class="tag">標準案件</span>
+                        <span class="tag">效率導向</span>
+                        <span class="tag">負載平衡</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- T2 資深客服 -->
+            <div class="persona-card t2-senior">
+                <div class="persona-header">
+                    <div class="avatar">👩‍🏫</div>
+                    <div class="persona-info">
+                        <h2>張阿華</h2>
+                        <div class="role">T2 資深客服專員</div>
+                        <div class="meta">35 歲 · 年資 6 年 · 客訴處理組</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="section">
+                        <div class="section-title">💬 代表引述</div>
+                        <div class="quote">
+                            「處理客訴最重要的是先讓客戶感受到被重視。但有時候公司流程太慢，等簽核的時間客戶又更生氣了。」
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🎯 工作目標</div>
+                        <ul class="goals-list">
+                            <li>處理高難度和 VIP 案件</li>
+                            <li>化解客戶不滿，降低升級風險</li>
+                            <li>指導組內新進同仁</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">😫 主要痛點</div>
+                        <ul class="pains-list">
+                            <li>困難案件都集中到資深</li>
+                            <li>既要處理案件又要帶新人</li>
+                            <li>補償方案簽核流程慢</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">✨ 需求</div>
+                        <ul class="needs-list">
+                            <li>合理案件數量上限</li>
+                            <li>快速簽核流程</li>
+                            <li>案例知識庫</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tags">
+                        <span class="tag">困難案件</span>
+                        <span class="tag">客訴處理</span>
+                        <span class="tag">經驗傳承</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- T2 主管 -->
+            <div class="persona-card manager">
+                <div class="persona-header">
+                    <div class="avatar">👩‍💼</div>
+                    <div class="persona-info">
+                        <h2>王美玲</h2>
+                        <div class="role">T2 客服主管</div>
+                        <div class="meta">40 歲 · 年資 10 年 · 管轄 2 組 15 人</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="section">
+                        <div class="section-title">💬 代表引述</div>
+                        <div class="quote">
+                            「我每天花最多時間的事情就是分派案件，但這應該可以讓系統自動處理啊。」
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🎯 工作目標</div>
+                        <ul class="goals-list">
+                            <li>確保團隊 SLA 達成率</li>
+                            <li>合理分配工作負載</li>
+                            <li>優化處理流程</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">😫 主要痛點</div>
+                        <ul class="pains-list">
+                            <li>每天花 1-2 小時手動分派</li>
+                            <li>數據分散在多個系統</li>
+                            <li>難以即時監控團隊負載</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">✨ 需求</div>
+                        <ul class="needs-list">
+                            <li>自動分派系統</li>
+                            <li>即時儀表板</li>
+                            <li>整合報表</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tags">
+                        <span class="tag">團隊管理</span>
+                        <span class="tag">績效監控</span>
+                        <span class="tag">流程優化</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 客戶 -->
+            <div class="persona-card customer">
+                <div class="persona-header">
+                    <div class="avatar">🧑</div>
+                    <div class="persona-info">
+                        <h2>李志明</h2>
+                        <div class="role">客戶（金卡會員）</div>
+                        <div class="meta">32 歲 · 上班族 · 每月消費 2-3 次</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="section">
+                        <div class="section-title">💬 代表引述</div>
+                        <div class="quote">
+                            「我只是想退一個有問題的商品，為什麼要打這麼多次電話、講這麼多次一樣的話？」
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🎯 期望</div>
+                        <ul class="goals-list">
+                            <li>問題能快速被解決</li>
+                            <li>不用重複說明問題</li>
+                            <li>得到合理的補償</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">😫 主要痛點</div>
+                        <ul class="pains-list">
+                            <li>等待時間長</li>
+                            <li>每次轉接都要重新說明</li>
+                            <li>收到罐頭回覆感覺不被重視</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">✨ 需求</div>
+                        <ul class="needs-list">
+                            <li>快速回應</li>
+                            <li>記住我的問題</li>
+                            <li>主動更新進度</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tags">
+                        <span class="tag">快速解決</span>
+                        <span class="tag">被重視</span>
+                        <span class="tag">進度透明</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <div class="comparison-section">
+            <h2>📊 Persona 比較</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>面向</th>
+                        <th><span class="color-dot blue"></span>T1 小芳</th>
+                        <th><span class="color-dot green"></span>T2 小明</th>
+                        <th><span class="color-dot orange"></span>T2 阿華</th>
+                        <th><span class="color-dot purple"></span>主管美玲</th>
+                        <th><span class="color-dot red"></span>客戶志明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>核心任務</strong></td>
+                        <td>接聽、建單、分派</td>
+                        <td>處理標準案件</td>
+                        <td>處理困難案件</td>
+                        <td>管理團隊績效</td>
+                        <td>解決問題</td>
+                    </tr>
+                    <tr>
+                        <td><strong>最大痛點</strong></td>
+                        <td>資訊散落</td>
+                        <td>KPI 壓力</td>
+                        <td>案件集中</td>
+                        <td>手動分派耗時</td>
+                        <td>等待時間長</td>
+                    </tr>
+                    <tr>
+                        <td><strong>最需功能</strong></td>
+                        <td>整合介面</td>
+                        <td>自動分派</td>
+                        <td>快速簽核</td>
+                        <td>即時儀表板</td>
+                        <td>主動通知</td>
+                    </tr>
+                    <tr>
+                        <td><strong>成功指標</strong></td>
+                        <td>分派正確率</td>
+                        <td>處理時效</td>
+                        <td>客訴解決率</td>
+                        <td>團隊 SLA</td>
+                        <td>問題解決</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Design Insights -->
+        <div class="comparison-section">
+            <h2>🎯 設計啟發</h2>
+            <p style="color:#666; margin-bottom:16px;">從 Persona 痛點推導出的功能方向</p>
+            <div class="insights-grid">
+                <div class="insight-card" style="border-left-color:#3498db;">
+                    <h4>🔵 整合式客戶檢視</h4>
+                    <p>解決 T1 小芳「資訊散落」的問題，一個畫面看到所有客戶資訊</p>
+                </div>
+                <div class="insight-card" style="border-left-color:#2ecc71;">
+                    <h4>🟢 自動分派 + 負載平衡</h4>
+                    <p>解決 T2 小明「案件量不均」和主管「手動分派耗時」的問題</p>
+                </div>
+                <div class="insight-card" style="border-left-color:#e67e22;">
+                    <h4>🟠 快速簽核流程</h4>
+                    <p>解決阿華「決策權限慢」的問題，授權資深客服一定額度內直接決定</p>
+                </div>
+                <div class="insight-card" style="border-left-color:#9b59b6;">
+                    <h4>🟣 即時儀表板</h4>
+                    <p>解決主管美玲「難以即時監控」的問題，一眼掌握團隊狀態</p>
+                </div>
+                <div class="insight-card" style="border-left-color:#2ecc71;">
+                    <h4>🟢 組別 KPI（隱藏個人）</h4>
+                    <p>解決 T2 小明「KPI 壓力」的問題，只顯示組別績效</p>
+                </div>
+                <div class="insight-card" style="border-left-color:#e74c3c;">
+                    <h4>🔴 處理進度主動推播</h4>
+                    <p>解決客戶志明「回覆慢」的問題，主動通知處理進度</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
